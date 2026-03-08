@@ -32,7 +32,8 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
     let cfg = JSON.parse(s);
     const telegramAllow = (env.TELEGRAM_GROUP_ALLOW_FROM && env.TELEGRAM_GROUP_ALLOW_FROM !== '') ? env.TELEGRAM_GROUP_ALLOW_FROM : '[]';
     try {
-      const arr = JSON.parse(telegramAllow);
+      let arr = JSON.parse(telegramAllow);
+      if (!Array.isArray(arr)) arr = [].concat(arr);
       if (cfg.channels && cfg.channels.telegram) {
         cfg.channels.telegram.groupAllowFrom = arr;
         cfg.channels.telegram.allowFrom = arr;
@@ -55,7 +56,7 @@ mkdir -p "$ROOT/workspace" "$ROOT/cron"
 
 # OpenClaw læser som standard fra ~/.openclaw/openclaw.json – sæt HOME så den finder vores config
 export OPENCLAW_CONFIG_DIR="$ROOT"
-mkdir -p "$ROOT/.openclaw"
+mkdir -p "$ROOT/.openclaw" "$ROOT/.openclaw/agents/main/sessions" "$ROOT/.openclaw/credentials"
 cp "$ROOT/openclaw.json" "$ROOT/.openclaw/openclaw.json"
 export HOME="$ROOT"
 

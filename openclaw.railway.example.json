@@ -4,9 +4,9 @@
     "lastTouchedAt": "2026-03-01T12:16:08.270Z"
   },
   "wizard": {
-    "lastRunAt": null,
-    "lastRunVersion": null,
-    "lastRunCommand": null,
+    "lastRunAt": "",
+    "lastRunVersion": "",
+    "lastRunCommand": "",
     "lastRunMode": "local"
   },
   "models": {
