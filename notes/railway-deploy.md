@@ -139,6 +139,7 @@ For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL og sa
 - **Telegram svarer ikke:** Tjek at bot-token er korrekt og at `TELEGRAM_GROUP_ALLOW_FROM` er et gyldigt JSON-array (fx `["12345678"]`).
 - **Port:** Du må ikke hardcode port; brug altid `$PORT` (scriptet gør det).
 - **"JavaScript heap out of memory":** Start-scriptet sætter nu `NODE_OPTIONS=--max-old-space-size=1024` (1 GB). Hvis det stadig crasher: øg **Service memory** i Railway (Settings → Resources), eller sæt i Variables fx `NODE_OPTIONS=--max-old-space-size=1536`.
+- **"Missing requirements: 47" / "Eligible: 4":** Normalt på Railway. OpenClaw kender mange skills; kun de 4 har opfyldte krav (env, tools) i containeren. Gatewayen kører fint med de eligible; resten bruges ikke.
 
 ---
 

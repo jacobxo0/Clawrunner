@@ -58,6 +58,8 @@ mkdir -p "$ROOT/workspace" "$ROOT/cron"
 export OPENCLAW_CONFIG_DIR="$ROOT"
 mkdir -p "$ROOT/.openclaw" "$ROOT/.openclaw/agents/main/sessions" "$ROOT/.openclaw/credentials"
 cp "$ROOT/openclaw.json" "$ROOT/.openclaw/openclaw.json"
+chmod 700 "$ROOT/.openclaw"
+chmod 600 "$ROOT/.openclaw/openclaw.json"
 export HOME="$ROOT"
 
 # Anvend Doctor-ændringer (fx så gateway.mode/config bliver registreret); fejl ignoreres i headless
