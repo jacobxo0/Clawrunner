@@ -85,6 +85,31 @@ Hvis du ikke bruger railway.toml: I Railway **Settings** → **Deploy** → **Cu
 
 ---
 
+## Når deploy er kørt (efter push eller Restart)
+
+**A. Verificer at deploy lykkedes**
+
+- Railway Dashboard → Deployments → seneste deployment skal være grøn.
+- View Logs: tjek at der står "openclaw.json genereret fra template" og at gatewayen starter uden exit (ingen "OPENCLAW_GATEWAY_TOKEN ikke sat" eller crash).
+- Lokalt (hvis Railway CLI er linket): kør `.\scripts\railway-logs-to-workspace.ps1` og læs `logs/railway-latest.txt`.
+
+**B. Domæne og Telegram (første gang, eller ved nyt domæne)**
+
+- Settings → Networking → **Generate Domain** (fx `xxx.up.railway.app`). Notér URL.
+- Sæt Telegram webhook: `https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook?url=https://<DIT_DOMÆNE>/telegram` (curl eller browser; token fra Railway Variables).
+
+**C. Test fra PC**
+
+- Samme token som `OPENCLAW_GATEWAY_TOKEN` i Railway.
+- PowerShell: `$env:OPENCLAW_GATEWAY_TOKEN="<token>"; openclaw --gateway https://<DIT_DOMÆNE> cron list` — forventet: liste over jobs eller tom, ingen Unauthorized.
+- Send besked til botten i Telegram og tjek at den svarer.
+
+**D. Forventet i logs (ikke fejl)**
+
+- "Eligible: 4", "Missing requirements: 47" — forventet; se Fejlsøgning nedenfor. Ingen handling.
+
+---
+
 ## Trin 5: Domæne og adgang
 
 - Under **Settings** → **Networking** kan du **Generate Domain**. Du får en URL (fx `xxx.up.railway.app`).

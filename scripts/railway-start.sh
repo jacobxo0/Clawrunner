@@ -62,8 +62,8 @@ chmod 700 "$ROOT/.openclaw"
 chmod 600 "$ROOT/.openclaw/openclaw.json"
 export HOME="$ROOT"
 
-# Anvend Doctor-ændringer (fx så gateway.mode/config bliver registreret); fejl ignoreres i headless
-npx openclaw doctor --fix 2>/dev/null || true
+# Doctor er diagnostik; kør ikke på hver start – kan blokere/exit i Railway og forhindre gateway-start
+# npx openclaw doctor --fix 2>/dev/null || true
 
 # Øg Node heap for at undgå "JavaScript heap out of memory" (gateway + skills kan bruge > default)
 [ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"
