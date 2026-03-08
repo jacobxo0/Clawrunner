@@ -3,6 +3,9 @@
 
 FROM node:20-bookworm-slim
 
+# npm install kan kalde git (fx ved openclaw eller dependencies fra git)
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies first (better layer cache)
