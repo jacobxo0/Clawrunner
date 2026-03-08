@@ -63,6 +63,9 @@ export HOME="$ROOT"
 # Anvend Doctor-ændringer (fx så gateway.mode/config bliver registreret); fejl ignoreres i headless
 npx openclaw doctor --fix 2>/dev/null || true
 
+# Øg Node heap for at undgå "JavaScript heap out of memory" (gateway + skills kan bruge > default)
+[ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"
+
 # I Docker/Railway er openclaw kun i node_modules; brug npx så den findes.
 # --allow-unconfigured: undgå "Missing config" når der ikke køres openclaw setup (headless deploy).
 exec npx openclaw gateway --port "$PORT" --allow-unconfigured

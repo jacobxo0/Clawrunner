@@ -138,6 +138,7 @@ For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL og sa
 - **Gateway starter ikke:** Tjek at `OPENCLAW_GATEWAY_TOKEN` og `TELEGRAM_BOT_TOKEN` er sat og at start-kommandoen er `bash scripts/railway-start.sh`.
 - **Telegram svarer ikke:** Tjek at bot-token er korrekt og at `TELEGRAM_GROUP_ALLOW_FROM` er et gyldigt JSON-array (fx `["12345678"]`).
 - **Port:** Du må ikke hardcode port; brug altid `$PORT` (scriptet gør det).
+- **"JavaScript heap out of memory":** Start-scriptet sætter nu `NODE_OPTIONS=--max-old-space-size=1024` (1 GB). Hvis det stadig crasher: øg **Service memory** i Railway (Settings → Resources), eller sæt i Variables fx `NODE_OPTIONS=--max-old-space-size=1536`.
 
 ---
 
