@@ -88,9 +88,35 @@ Hvis du ikke bruger railway.toml: I Railway **Settings** → **Deploy** → **Cu
 ## Trin 5: Domæne og adgang
 
 - Under **Settings** → **Networking** kan du **Generate Domain**. Du får en URL (fx `xxx.up.railway.app`).
-- Gatewayen eksponerer typisk WebSocket/API på den port Railway tildeler; den er ikke en statisk webside. Cursor/CLI forbinder sig til gatewayen via URL + port (Railway routerer trafik til din app).
+- Gatewayen eksponerer typisk WebSocket/API på den port Railway tildeler; Railway routerer trafik til din app – du bruger kun domænet uden port i URL.
 
-For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL (inkl. port hvis vist), og samme `OPENCLAW_GATEWAY_TOKEN` som du sat i Railway.
+For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL og samme `OPENCLAW_GATEWAY_TOKEN` som du sat i Railway.
+
+### Live gateway (Clawrunner)
+
+| | |
+|--|--|
+| **Public URL** | **https://clawrunner.railway.app** |
+| **Port** | Railway injicerer PORT internt; du bruger kun domænet i URL. |
+
+**Telegram webhook** — URL: `https://clawrunner.railway.app/telegram`
+
+- **Option A (curl):** Erstatt `<TELEGRAM_BOT_TOKEN>` med værdien fra Railway Variables → TELEGRAM_BOT_TOKEN.
+  ```bash
+  curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+    -d "url=https://clawrunner.railway.app/telegram"
+  ```
+- **Option B (BotFather):** I Telegram: skriv til @BotFather → send `/setwebhook` → angiv URL: `https://clawrunner.railway.app/telegram`.
+
+**OpenClaw CLI** — peg mod Railway-gatewayen fra din PC:
+
+- Base URL: `https://clawrunner.railway.app`
+- Token: samme værdi som `OPENCLAW_GATEWAY_TOKEN` i Railway Variables.
+- Eksempel (erstat `<token>` og `<command>`):
+  ```bash
+  OPENCLAW_GATEWAY_TOKEN="<token>" openclaw --gateway https://clawrunner.railway.app <command>
+  ```
+  Fx: `OPENCLAW_GATEWAY_TOKEN="<token>" openclaw --gateway https://clawrunner.railway.app cron list`
 
 ---
 
