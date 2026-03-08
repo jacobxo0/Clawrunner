@@ -1,0 +1,2 @@
+# Railway runs on Linux; bash scripts must use LF
+*.sh text eol=lf

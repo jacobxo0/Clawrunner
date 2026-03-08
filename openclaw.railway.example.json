@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.2.12",
+    "lastTouchedAt": "2026-03-01T12:16:08.270Z"
+  },
+  "wizard": {
+    "lastRunAt": null,
+    "lastRunVersion": null,
+    "lastRunCommand": null,
+    "lastRunMode": "local"
+  },
+  "models": {
+    "providers": {
+      "ollama": {
+        "api": "ollama",
+        "baseUrl": "${OLLAMA_BASE_URL}"
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/gpt-5.1-codex"
+      },
+      "models": {
+        "openai/gpt-5.1-codex": {
+          "alias": "GPT"
+        },
+        "anthropic/claude-3.5-sonnet": {
+          "alias": "Claude"
+        },
+        "ollama/llama3.2:3b": {
+          "alias": "Ollama"
+        }
+      },
+      "workspace": "./workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    }
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "brave",
+        "apiKey": "${BRAVE_API_KEY}",
+        "maxResults": 10,
+        "timeoutSeconds": 30
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "groupAllowFrom": ${TELEGRAM_GROUP_ALLOW_FROM},
+      "allowFrom": ${TELEGRAM_GROUP_ALLOW_FROM},
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      },
+      "groupPolicy": "allowlist",
+      "streamMode": "partial"
+    },
+    "discord": {
+      "enabled": false,
+      "groupPolicy": "allowlist"
+    },
+    "slack": {
+      "mode": "socket",
+      "webhookPath": "/slack/events",
+      "enabled": false,
+      "userTokenReadOnly": true,
+      "groupPolicy": "allowlist"
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "calendar.add",
+        "contacts.add",
+        "reminders.add"
+      ]
+    }
+  },
+  "skills": {
+    "entries": {
+      "github": {
+        "enabled": true,
+        "env": {
+          "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+          "GITHUB_USERNAME": "${GITHUB_USERNAME}"
+        }
+      },
+      "notion-api-integration": {
+        "enabled": true
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      },
+      "discord": {
+        "enabled": false
+      },
+      "slack": {
+        "enabled": false
+      }
+    }
+  }
+}

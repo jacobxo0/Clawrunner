@@ -1,0 +1,113 @@
+# Deploy OpenClaw gateway på Railway
+
+Så du kan pushe til GitHub og lade Railway bygge og køre gatewayen. Telegram og cron kører når appen kører; workspace og cron-data er ephemeral medmindre du tilknytter et Volume.
+
+---
+
+## Forudsætninger
+
+- Et GitHub-repo med OpenClaw-koden (denne mappe); forbundet til Railway.
+- Railway bruger Node 20+ (angivet i `package.json` under `engines.node`).
+- Du har værdierne til gateway-token, Telegram bot-token og evt. Brave API key.
+
+---
+
+## Trin 1: Opret projekt på Railway
+
+1. Gå til [railway.app](https://railway.app) og log ind.
+2. **New Project** → **Deploy from GitHub repo**.
+3. Vælg dit repo og (evt.) den branch der skal deployes (fx `main`).
+4. Railway genkender `package.json` og kører `npm install` som build.
+
+---
+
+## Trin 2: Sæt miljøvariabler
+
+I Railway: **Project** → dit service → **Variables**. Tilføj:
+
+| Variabel | Påkrævet | Beskrivelse |
+|----------|----------|-------------|
+| `OPENCLAW_GATEWAY_TOKEN` | Ja | Gateway auth-token (samme som i din lokale `openclaw.json` under `gateway.auth.token`). |
+| `TELEGRAM_BOT_TOKEN` | Ja (hvis Telegram) | Telegram bot-token fra BotFather. |
+| `TELEGRAM_GROUP_ALLOW_FROM` | Anbefalet | JSON-array med tilladte Telegram user-id’er, fx `["8572521981"]`. |
+| `BRAVE_API_KEY` | Anbefalet | API-nøgle til web search (Brave). |
+| `GITHUB_TOKEN` | Valgfrit | Til GitHub-skill. |
+| `GITHUB_USERNAME` | Valgfrit | Til GitHub-skill. |
+| `OLLAMA_BASE_URL` | Valgfrit | Når Ollama kører på en VPS: `http://<VPS-IP>:11434`. Gatewayen bruger så VPS-Ollama. Lad stå tom hvis du ikke bruger Ollama. |
+| `OLLAMA_API_KEY` | Valgfrit | Fx `ollama-vps` når du bruger OLLAMA_BASE_URL. |
+
+**Bemærk:** `PORT` sættes automatisk af Railway – du skal ikke tilføje den selv.
+
+### Checkliste: Hvor finder du værdierne?
+
+Kopiér fra din lokale **`openclaw.json`** (samme mappe som denne note) ind i Railway Variables:
+
+| Railway variable | I openclaw.json |
+|------------------|------------------|
+| `OPENCLAW_GATEWAY_TOKEN` | `gateway.auth.token` |
+| `TELEGRAM_BOT_TOKEN` | `channels.telegram.botToken` |
+| `TELEGRAM_GROUP_ALLOW_FROM` | `channels.telegram.allowFrom` – skal være JSON, fx `["8572521981"]` |
+| `BRAVE_API_KEY` | `tools.web.search.apiKey` |
+| `GITHUB_TOKEN` | `skills.entries.github.env.GITHUB_TOKEN` |
+| `GITHUB_USERNAME` | `skills.entries.github.env.GITHUB_USERNAME` |
+
+`OLLAMA_BASE_URL`: sæt kun hvis Ollama kører på en VPS – `http://<VPS-IP>:11434`. Se [notes/plan-ollama-paa-vps.md](plan-ollama-paa-vps.md). `OLLAMA_API_KEY`: fx `ollama-vps`.
+
+---
+
+## Trin 3: Start-kommando
+
+Repo indeholder **railway.toml** med `startCommand = "bash scripts/railway-start.sh"`. Railway bruger den automatisk – du behøver ikke sætte Custom Start Command i dashboard.
+
+Hvis du ikke bruger railway.toml: I Railway **Settings** → **Deploy** → **Custom Start Command** kan du sætte `bash scripts/railway-start.sh`. Uden det kører Railway `npm start`, som kun starter gatewayen uden at bygge `openclaw.json` fra template.
+
+---
+
+## Trin 4: Deploy
+
+- **Push til den valgte branch** (fx `main`). Railway bygger og deployer automatisk.
+- Tjek **Deployments** og **Logs** for at se at gatewayen starter uden fejl.
+
+---
+
+## Trin 5: Domæne og adgang
+
+- Under **Settings** → **Networking** kan du **Generate Domain**. Du får en URL (fx `xxx.up.railway.app`).
+- Gatewayen eksponerer typisk WebSocket/API på den port Railway tildeler; den er ikke en statisk webside. Cursor/CLI forbinder sig til gatewayen via URL + port (Railway routerer trafik til din app).
+
+For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL (inkl. port hvis vist), og samme `OPENCLAW_GATEWAY_TOKEN` som du sat i Railway.
+
+---
+
+## Workspace og cron (persistering)
+
+- Railway’s filsystem er **ephemeral**: ved redeploy kan alt under app-mappen nulstilles.
+- **Railway Volumes:** For at bevare workspace og evt. `cron` mellem deploys kan du tilknytte et Volume og montere det fx på `/app/workspace` (og evt. `/app/cron`). Opret Volume i Railway og sæt mount path til `/app/workspace` (så matcher det `agents.defaults.workspace` i template).
+- Uden Volume: workspace og cron-jobs er midlertidige og kan forsvinde ved redeploy – brug det til test eller accepter at de ikke persisteres.
+
+---
+
+## Fejlsøgning
+
+- **"Build failed" / "Error creating build plan with Railpack":**
+  - Repo har nu en **Dockerfile**. Railway vælger automatisk Docker-build når Dockerfile findes – det omgår Railpack. Commit Dockerfile og .dockerignore, push igen.
+  - **Build-loggen:** Gå til Deployment → vælg den røde build → se **Build logs**. Fejler det under `npm install` (fx "404 Not Found" på openclaw), er pakkenavnet forkert. Fejler det under **Deploy** (efter build), er det start-scriptet eller env.
+  - **CRLF:** Hvis loggen viser bash-fejl (fx `\r: command not found`), skal shell-scripts have LF. Brug `.gitattributes` med `*.sh text eol=lf` og evt. `git add --renormalize .`.
+  - **Manglende env:** Hvis fejlen er "OPENCLAW_GATEWAY_TOKEN ikke sat", er det **Deploy**-fasen – sæt alle Variables (se Trin 2) før næste deploy.
+- **Gateway starter ikke:** Tjek at `OPENCLAW_GATEWAY_TOKEN` og `TELEGRAM_BOT_TOKEN` er sat og at start-kommandoen er `bash scripts/railway-start.sh`.
+- **Telegram svarer ikke:** Tjek at bot-token er korrekt og at `TELEGRAM_GROUP_ALLOW_FROM` er et gyldigt JSON-array (fx `["12345678"]`).
+- **Port:** Du må ikke hardcode port; brug altid `$PORT` (scriptet gør det).
+
+---
+
+## Filer i repo der bruges
+
+- `Dockerfile` – Railway bygger med Docker (undgår Railpack-fejl); kører `scripts/railway-start.sh`.
+- `.dockerignore` – udelukker node_modules, .git, openclaw.json så build er ren.
+- `package.json` – dependency på `openclaw`, start-script.
+- `openclaw.railway.example.json` – config-template med placeholders; bruges af `railway-start.sh`.
+- `scripts/railway-start.sh` – bygger `openclaw.json` fra env, opretter `workspace`/`cron`, starter `openclaw gateway --port $PORT`.
+
+**Script kørbart på Linux:** Hvis du cloner på Windows og Railway bygger derfra, skal scriptet være kørbart. Kør én gang lokalt (inden push): `git update-index --chmod=+x scripts/railway-start.sh` og commit – så er det executable i repo og på Railway.
+
+VPS-alternativ (fuld kontrol, persisteret disk): [notes/cloud-deployment-runbook.md](cloud-deployment-runbook.md).

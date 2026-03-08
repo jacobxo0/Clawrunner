@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "jobId": "instant-mesh-build",
+      "name": "instant-mesh-build",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "0 8 * * *", "tz": "Europe/Copenhagen" },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are BuildConductor. Read and execute the instructions in workspace/agents/instant-mesh/BUILD_CONDUCTOR.md. Work in workspace/projects/instant-mesh. Log to logs/build-log.md. Report summary and any ACTION REQUIRED."
+      },
+      "delivery": { "mode": "announce", "bestEffort": true }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "openclaw-deploy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenClaw gateway deploy (Railway/VPS)",
+  "scripts": {
+    "start": "openclaw gateway --port ${PORT:-18789}"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "openclaw": "latest"
+  }
+}

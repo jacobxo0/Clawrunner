@@ -1,0 +1,29 @@
+# Systemd unit for OpenClaw gateway (cloud/VPS).
+# Installér: sudo cp scripts/openclaw-gateway.service /etc/systemd/system/
+#            sudo systemctl daemon-reload
+#            sudo systemctl enable openclaw-gateway
+#            sudo systemctl start openclaw-gateway
+# Tjek:      sudo systemctl status openclaw-gateway
+#
+# Sæt OPENCLAW_ROOT og evt. OPENCLAW_GATEWAY_TOKEN i /etc/openclaw/env (opret filen)
+# eller brug Environment= i [Service] nedenfor.
+
+[Unit]
+Description=OpenClaw Gateway
+After=network.target
+
+[Service]
+Type=simple
+# Sæt User= til den bruger der ejer openclaw-mappen (fx ubuntu, root, eller din bruger)
+User=ubuntu
+WorkingDirectory=/home/ubuntu/openclaw
+EnvironmentFile=/home/ubuntu/openclaw/.env
+Environment=OPENCLAW_GATEWAY_PORT=18789
+Environment=NODE_ENV=production
+# På de fleste systemer: npm -g installerer til /usr/local/bin. Tjek med: which openclaw
+ExecStart=/usr/local/bin/openclaw gateway --port 18789
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

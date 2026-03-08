@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "41436810-8e5b-4d75-ab5f-c57ee4088580",
+      "name": "instant-mesh-build",
+      "enabled": true,
+      "createdAtMs": 1772309182516,
+      "updatedAtMs": 1772881144244,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8 * * *",
+        "tz": "Europe/Copenhagen"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are BuildConductor. Read and execute the instructions in workspace/agents/instant-mesh/BUILD_CONDUCTOR.md. Work in workspace/projects/instant-mesh. Log to logs/build-log.md. Report summary and any ACTION REQUIRED."
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1772953200000,
+        "lastRunAtMs": 1772880957121,
+        "lastStatus": "ok",
+        "lastDurationMs": 187123,
+        "consecutiveErrors": 0,
+        "lastRunStatus": "ok",
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered"
+      }
+    },
+    {
+      "id": "2ef4e384-bf75-4ba6-b4a7-2ab63c472958",
+      "name": "instant-mesh-investor",
+      "enabled": true,
+      "createdAtMs": 1772309234049,
+      "updatedAtMs": 1772639917335,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 10 * * 1,3",
+        "tz": "Europe/Copenhagen"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are InvestorScout. Read and execute workspace/agents/instant-mesh/INVESTOR_SCOUT.md. Work in workspace/projects/instant-mesh. Update investor/status.md and logs/investor-log.md. Report summary and any ACTION REQUIRED."
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1773046800000,
+        "lastRunAtMs": 1772639644614,
+        "lastStatus": "ok",
+        "lastDurationMs": 272721,
+        "consecutiveErrors": 0,
+        "lastRunStatus": "ok",
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered"
+      }
+    },
+    {
+      "id": "bd4d943c-8c02-4bef-8683-0525d714c94e",
+      "name": "instant-mesh-status",
+      "enabled": true,
+      "createdAtMs": 1772309236110,
+      "updatedAtMs": 1772910059121,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 20 * * *",
+        "tz": "Europe/Copenhagen"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are StatusWeaver. Read workspace/agents/instant-mesh/STATUS_WEAVER.md. Summarize build-log.md and investor/status.md (and wallet if present). Post short status to chat and update status-board.md."
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1772996400000,
+        "lastRunAtMs": 1772910000054,
+        "lastStatus": "ok",
+        "lastDurationMs": 59067,
+        "consecutiveErrors": 0,
+        "lastRunStatus": "ok",
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered"
+      }
+    }
+  ]
+}

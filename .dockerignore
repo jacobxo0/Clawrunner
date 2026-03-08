@@ -1,0 +1,8 @@
+# Færre filer = hurtigere build; undgå at overskrive node_modules fra npm install
+node_modules
+.git
+.env
+*.log
+.openclaw
+# Lokal config med secrets – Railway bruger template + env
+openclaw.json
