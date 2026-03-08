@@ -30,6 +30,14 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
     }
     s = s.replace(/\$\{([^}]+)\}/g, repl);
     let cfg = JSON.parse(s);
+    const telegramAllow = (env.TELEGRAM_GROUP_ALLOW_FROM && env.TELEGRAM_GROUP_ALLOW_FROM !== '') ? env.TELEGRAM_GROUP_ALLOW_FROM : '[]';
+    try {
+      const arr = JSON.parse(telegramAllow);
+      if (cfg.channels && cfg.channels.telegram) {
+        cfg.channels.telegram.groupAllowFrom = arr;
+        cfg.channels.telegram.allowFrom = arr;
+      }
+    } catch (_) {}
     if (!env.OLLAMA_BASE_URL || env.OLLAMA_BASE_URL === '') {
       delete cfg.models;
       if (cfg.agents && cfg.agents.defaults && cfg.agents.defaults.models)

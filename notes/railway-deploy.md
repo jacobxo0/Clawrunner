@@ -68,6 +68,21 @@ Hvis du ikke bruger railway.toml: I Railway **Settings** → **Deploy** → **Cu
 - **Push til den valgte branch** (fx `main`). Railway bygger og deployer automatisk.
 - Tjek **Deployments** og **Logs** for at se at gatewayen starter uden fejl.
 
+### Følge build-logs live (så agenten kan rette fejl)
+
+1. **Railway CLI → fil i workspace**  
+   Installér Railway CLI: `npm i -g @railway/cli`. Log ind og link til projektet (fx `railway link`). Kør derefter:
+   ```powershell
+   .\scripts\railway-logs-to-workspace.ps1
+   ```
+   Scriptet henter de seneste build- og deploy-logs til **`logs/railway-latest.txt`**. Agenten kan læse den fil og rette fejl (fx JSON parse, manglende env).
+
+2. **Efter push: agenten kører log-script**  
+   Når agenten selv deployer (commit + push), bør den herefter køre `railway-logs-to-workspace.ps1`, læse `logs/railway-latest.txt` og rette eventuelle fejl i samme ombæring.
+
+3. **Manuelt: del log eller screenshot**  
+   Hvis du ikke bruger CLI: Åbn Railway → Deployments → vælg seneste → **View Logs**. Ved fejl kan du paste log-udtog eller dele et screenshot her i chatten – så kan agenten fejlsøge og lave fix + nyt push.
+
 ---
 
 ## Trin 5: Domæne og adgang

@@ -65,8 +65,8 @@
       "enabled": true,
       "dmPolicy": "pairing",
       "botToken": "${TELEGRAM_BOT_TOKEN}",
-      "groupAllowFrom": ${TELEGRAM_GROUP_ALLOW_FROM},
-      "allowFrom": ${TELEGRAM_GROUP_ALLOW_FROM},
+      "groupAllowFrom": [],
+      "allowFrom": [],
       "groups": {
         "*": {
           "requireMention": true
