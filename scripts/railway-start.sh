@@ -77,19 +77,25 @@ echo "[DEBUG] .openclaw config dir OK OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR"
 # Doctor er diagnostik; kør ikke på hver start – kan blokere/exit i Railway og forhindre gateway-start
 # npx openclaw doctor --fix 2>/dev/null || true
 
-# Øg Node heap for at undgå "JavaScript heap out of memory" (gateway + skills kan bruge > default)
+# Øg Node heap; vis uafviklede promise-afvisninger så vi ser fejl i logs
 [ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"
+export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn"
 
 # Tjek at openclaw findes (output i logs; fejler vi her, næste linje viser det)
 echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
-# Kør gateway UDEN exec så vi kan logge exit-kode når den crasher (ellers ser vi ingen fejl i Railway)
+# Kør gateway; fang stderr til fil og vis den efter exit (så Railway viser den reelle fejl)
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
-npx openclaw gateway --port "$PORT" --allow-unconfigured
+GW_STDERR="$ROOT/gateway.stderr"
+npx openclaw gateway --port "$PORT" --allow-unconfigured 2> "$GW_STDERR"
 EXIT=$?
 set -e
+if [ -s "$GW_STDERR" ]; then
+  echo "[STDERR from gateway]"
+  cat "$GW_STDERR"
+fi
 echo "[FATAL] Gateway exited with code $EXIT"
 exit $EXIT
