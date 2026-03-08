@@ -56,5 +56,6 @@ mkdir -p "$ROOT/workspace" "$ROOT/cron"
 # OpenClaw læser config fra OPENCLAW_CONFIG_DIR eller current dir
 export OPENCLAW_CONFIG_DIR="$ROOT"
 
-# I Docker/Railway er openclaw kun i node_modules; brug npx så den findes
-exec npx openclaw gateway --port "$PORT"
+# I Docker/Railway er openclaw kun i node_modules; brug npx så den findes.
+# --allow-unconfigured: undgå "Missing config" når der ikke køres openclaw setup (headless deploy).
+exec npx openclaw gateway --port "$PORT" --allow-unconfigured
