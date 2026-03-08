@@ -36,8 +36,14 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
     let cfg = JSON.parse(s);
     const telegramAllow = (env.TELEGRAM_GROUP_ALLOW_FROM && env.TELEGRAM_GROUP_ALLOW_FROM !== '') ? env.TELEGRAM_GROUP_ALLOW_FROM : '[]';
     try {
-      let arr = JSON.parse(telegramAllow);
-      if (!Array.isArray(arr)) arr = [].concat(arr);
+      let arr;
+      try {
+        const parsed = JSON.parse(telegramAllow);
+        arr = Array.isArray(parsed) ? parsed : [parsed];
+      } catch (_) {
+        arr = [telegramAllow];
+      }
+      arr = arr.map(function (id) { return String(id); });
       if (cfg.channels && cfg.channels.telegram) {
         cfg.channels.telegram.groupAllowFrom = arr;
         cfg.channels.telegram.allowFrom = arr;
