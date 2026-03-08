@@ -1,7 +1,7 @@
 # Railway: byg med Docker i stedet for Railpack (undgår "Error creating build plan with Railpack").
-# Node 20, npm install, kør railway-start.sh.
+# OpenClaw kræver Node 22.12+; npm install, kør railway-start.sh.
 
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 # npm install kan kalde git (fx ved openclaw eller dependencies fra git)
 RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*

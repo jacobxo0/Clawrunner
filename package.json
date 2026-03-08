@@ -7,7 +7,7 @@
     "start": "openclaw gateway --port ${PORT:-18789}"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "openclaw": "latest"
