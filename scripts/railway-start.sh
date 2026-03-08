@@ -53,8 +53,14 @@ fi
 # Opret workspace og cron så gatewayen ikke fejler
 mkdir -p "$ROOT/workspace" "$ROOT/cron"
 
-# OpenClaw læser config fra OPENCLAW_CONFIG_DIR eller current dir
+# OpenClaw læser som standard fra ~/.openclaw/openclaw.json – sæt HOME så den finder vores config
 export OPENCLAW_CONFIG_DIR="$ROOT"
+mkdir -p "$ROOT/.openclaw"
+cp "$ROOT/openclaw.json" "$ROOT/.openclaw/openclaw.json"
+export HOME="$ROOT"
+
+# Anvend Doctor-ændringer (fx så gateway.mode/config bliver registreret); fejl ignoreres i headless
+npx openclaw doctor --fix 2>/dev/null || true
 
 # I Docker/Railway er openclaw kun i node_modules; brug npx så den findes.
 # --allow-unconfigured: undgå "Missing config" når der ikke køres openclaw setup (headless deploy).
