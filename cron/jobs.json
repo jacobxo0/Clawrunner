@@ -6,7 +6,7 @@
       "name": "instant-mesh-build",
       "enabled": true,
       "createdAtMs": 1772309182516,
-      "updatedAtMs": 1772881144244,
+      "updatedAtMs": 1772965846686,
       "schedule": {
         "kind": "cron",
         "expr": "0 8 * * *",
@@ -23,10 +23,10 @@
         "channel": "last"
       },
       "state": {
-        "nextRunAtMs": 1772953200000,
-        "lastRunAtMs": 1772880957121,
+        "nextRunAtMs": 1773039600000,
+        "lastRunAtMs": 1772965774341,
         "lastStatus": "ok",
-        "lastDurationMs": 187123,
+        "lastDurationMs": 72345,
         "consecutiveErrors": 0,
         "lastRunStatus": "ok",
         "lastDelivered": true,

@@ -23,7 +23,12 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
     const fs = require('fs');
     let s = fs.readFileSync('openclaw.railway.example.json', 'utf8');
     const env = process.env;
-    s = s.replace(/\$\{([^}]+)\}/g, (_, name) => env[name] !== undefined ? env[name] : '');
+    function repl(_, name) {
+      const v = env[name];
+      if (name === 'TELEGRAM_GROUP_ALLOW_FROM') return (v !== undefined && v !== '') ? v : '[]';
+      return v !== undefined ? v : '';
+    }
+    s = s.replace(/\$\{([^}]+)\}/g, repl);
     let cfg = JSON.parse(s);
     if (!env.OLLAMA_BASE_URL || env.OLLAMA_BASE_URL === '') {
       delete cfg.models;

@@ -39,7 +39,7 @@ Kort og ærligt: hvad der **kører** vs. hvad der **er planlagt men ikke live**.
 
 OpenClaw som **platform** kan meget (chat, gateway, cron-motor, spawn, skills). Men hos dig er det meste **ubrugt** lige nu:
 
-- Cron-motoren er der, men **ingen jobs er tilføjet**.
+- Cron-motoren er der, og **3 jobs** er i `cron/jobs.json` (instant-mesh-build, -investor, -status); de kører når gatewayen kører.
 - Agent-prompts og run-scripts findes, men de kører kun ved **manuelle** kald.
 - Der er mange planer (wallet, reklame, dashboard), men **ingen af dem er leveret endnu**.
 
@@ -65,4 +65,4 @@ Så det der “gr” (gør) er i praksis: **svar i Telegram + manuel kørsel af 
 
 ---
 
-*Opdateret 2026-02-28*
+*Opdateret 2026-03-08. Cursor har forsøgt at starte gateway i baggrunden; for vedvarende kørsel: kør `.\scripts\start-gateway.ps1` i et dedikeret terminal og lad det stå åbent.*
