@@ -79,7 +79,11 @@ echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
-# I Docker/Railway er openclaw kun i node_modules; brug npx så den findes.
-# --allow-unconfigured: undgå "Missing config" når der ikke køres openclaw setup (headless deploy).
-echo "[DEBUG] Starting OpenClaw gateway on port $PORT (exec replaces this process)..."
-exec npx openclaw gateway --port "$PORT" --allow-unconfigured
+# Kør gateway UDEN exec så vi kan logge exit-kode når den crasher (ellers ser vi ingen fejl i Railway)
+echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
+set +e
+npx openclaw gateway --port "$PORT" --allow-unconfigured
+EXIT=$?
+set -e
+echo "[FATAL] Gateway exited with code $EXIT"
+exit $EXIT

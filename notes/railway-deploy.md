@@ -155,7 +155,7 @@ For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL og sa
 
 ## Fejlsøgning
 
-**Debug i Deploy Logs:** Start-scriptet skriver `[DEBUG]`-linjer så du kan se hvor langt det når. Rækkefølge: `ROOT/PWD` → `PORT` → token sat → openclaw.json genereret → workspace/cron OK → .openclaw OK → openclaw --version check → `Starting OpenClaw gateway on port X`. Stopper det før "Starting OpenClaw gateway", er fejlen i det trin der mangler. Stopper gatewayen lige efter, er fejlen i selve openclaw gateway-processen (tjek for Node/JavaScript-fejl i logs).
+**Debug i Deploy Logs:** Start-scriptet skriver `[DEBUG]`-linjer så du kan se hvor langt det når. Rækkefølge: `ROOT/PWD` → `PORT` → token sat → openclaw.json genereret → workspace/cron OK → .openclaw OK → openclaw --version check → `Starting OpenClaw gateway on port X`. Stopper det før "Starting OpenClaw gateway", er fejlen i det trin der mangler. Når gatewayen starter men containeren crasher alligevel, viser scriptet nu **`[FATAL] Gateway exited with code N`** — exit-kode 1 = fejl, 137 = OOM kill, 139 = segfault. Tjek også for Node/JavaScript-stack traces lige før den linje.
 
 - **"Build failed" / "Error creating build plan with Railpack":**
   - Repo har nu en **Dockerfile**. Railway vælger automatisk Docker-build når Dockerfile findes – det omgår Railpack. Commit Dockerfile og .dockerignore, push igen.
