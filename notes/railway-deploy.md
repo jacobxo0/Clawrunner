@@ -121,27 +121,27 @@ For at bruge gatewayen fra din PC: brug den genererede URL som gateway-URL og sa
 
 | | |
 |--|--|
-| **Public URL** | **https://clawrunner-production.up.railway.app** (tjek din service: Variables viser `RAILWAY_PUBLIC_DOMAIN`) |
+| **Public URL** | **https://agile-charm.up.railway.app** (tjek din service: Variables viser `RAILWAY_PUBLIC_DOMAIN`) |
 | **Port** | Railway injicerer PORT internt; du bruger kun domænet i URL. |
 
-**Telegram webhook** — URL: `https://clawrunner-production.up.railway.app/telegram` (brug din egen RAILWAY_PUBLIC_DOMAIN)
+**Telegram webhook** — URL: `https://agile-charm.up.railway.app/telegram` (brug din egen RAILWAY_PUBLIC_DOMAIN)
 
 - **Option A (curl):** Erstatt `<TELEGRAM_BOT_TOKEN>` med værdien fra Railway Variables → TELEGRAM_BOT_TOKEN.
   ```bash
   curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
-    -d "url=https://clawrunner-production.up.railway.app/telegram"
+    -d "url=https://agile-charm.up.railway.app/telegram"
   ```
-- **Option B (BotFather):** I Telegram: skriv til @BotFather → send `/setwebhook` → angiv URL: `https://<DIN_PUBLIC_DOMAIN>/telegram` (fx clawrunner-production.up.railway.app).
+- **Option B (BotFather):** I Telegram: skriv til @BotFather → send `/setwebhook` → angiv URL: `https://<DIN_PUBLIC_DOMAIN>/telegram` (fx agile-charm.up.railway.app).
 
 **OpenClaw CLI** — peg mod Railway-gatewayen fra din PC:
 
-- Base URL: `https://clawrunner-production.up.railway.app` (eller din RAILWAY_PUBLIC_DOMAIN)
+- Base URL: `https://agile-charm.up.railway.app` (eller din RAILWAY_PUBLIC_DOMAIN)
 - Token: samme værdi som `OPENCLAW_GATEWAY_TOKEN` i Railway Variables.
 - Eksempel (erstat `<token>` og `<command>`):
   ```bash
-  OPENCLAW_GATEWAY_TOKEN="<token>" openclaw --gateway https://clawrunner-production.up.railway.app <command>
+  OPENCLAW_GATEWAY_TOKEN="<token>" openclaw --gateway https://agile-charm.up.railway.app <command>
   ```
-  Fx: `OPENCLAW_GATEWAY_TOKEN="<token>" openclaw --gateway https://clawrunner-production.up.railway.app cron list`
+  Fx: `OPENCLAW_GATEWAY_TOKEN="<token>" openclaw --gateway https://agile-charm.up.railway.app cron list`
 
 ---
 
