@@ -30,6 +30,7 @@ Standard lokalt: `http://localhost:8000`
 | `fetch_url` | HTTP GET en URL | `url: string`, `timeout?: int` |
 | `query_runs` | Hent seneste tool-runs fra memory | `failed_only?: bool`, `limit?: int`, `tool_name?: string` |
 | `suggest_fix` | Foreslå fix til fejl via Ollama | `error: string`, `tool_name?: string` |
+| `ollama_health` | Check om Ollama er nåbar + list modeller | `base_url?: string` |
 
 ## Svar-format (ToolResult)
 
