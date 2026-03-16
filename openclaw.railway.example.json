@@ -90,7 +90,7 @@
   "gateway": {
     "port": 18789,
     "mode": "local",
-    "bind": "loopback",
+    "bind": "all",
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_TOKEN}"
@@ -121,6 +121,12 @@
       },
       "notion-api-integration": {
         "enabled": true
+      },
+      "ai-core": {
+        "enabled": true,
+        "env": {
+          "AI_CORE_URL": "${AI_CORE_URL}"
+        }
       }
     }
   },

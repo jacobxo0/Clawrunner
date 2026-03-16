@@ -1,3 +1,8 @@
 # Railway deploy config.
 # Når Dockerfile findes, bruger Railway Docker (undgår "Error creating build plan with Railpack").
-# Start-kommando står i Dockerfile CMD. Se notes/railway-deploy.md for fuld guide.
+# Se notes/railway-deploy.md for fuld guide.
+
+[deploy]
+startCommand = "bash scripts/railway-start.sh"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
