@@ -124,10 +124,7 @@
         "enabled": true
       },
       "ai-core": {
-        "enabled": true,
-        "env": {
-          "AI_CORE_URL": "${AI_CORE_URL}"
-        }
+        "enabled": false
       }
     }
   },
