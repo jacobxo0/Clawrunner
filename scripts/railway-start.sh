@@ -49,10 +49,12 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
         cfg.channels.telegram.allowFrom = arr;
       }
     } catch (_) {}
-    if (!env.OLLAMA_BASE_URL || env.OLLAMA_BASE_URL === '') {
+    if (!env.GROQ_API_KEY || env.GROQ_API_KEY === '') {
       delete cfg.models;
-      if (cfg.agents && cfg.agents.defaults && cfg.agents.defaults.models)
-        delete cfg.agents.defaults.models['ollama/llama3.2:3b'];
+      if (cfg.agents && cfg.agents.defaults) {
+        cfg.agents.defaults.model = {};
+        if (cfg.agents.defaults.models) delete cfg.agents.defaults.models;
+      }
     }
     fs.writeFileSync('openclaw.json', JSON.stringify(cfg, null, 2));
   "
