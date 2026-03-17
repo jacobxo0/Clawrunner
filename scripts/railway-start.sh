@@ -88,16 +88,6 @@ echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
-# Kør gateway; fang stderr til fil og vis den efter exit (så Railway viser den reelle fejl)
+# Kør gateway — al output (stdout+stderr) går direkte til Railway logs
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
-set +e
-GW_STDERR="$ROOT/gateway.stderr"
-npx openclaw gateway --port "$PORT" --allow-unconfigured 2> "$GW_STDERR"
-EXIT=$?
-set -e
-if [ -s "$GW_STDERR" ]; then
-  echo "[STDERR from gateway]"
-  cat "$GW_STDERR"
-fi
-echo "[FATAL] Gateway exited with code $EXIT"
-exit $EXIT
+exec npx openclaw gateway --port "$PORT" --allow-unconfigured
