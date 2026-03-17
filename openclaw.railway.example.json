@@ -16,8 +16,8 @@
         "baseUrl": "https://api.groq.com/openai/v1",
         "apiKey": "${GROQ_API_KEY}",
         "models": [
-          { "id": "llama-3.3-70b-versatile" },
-          { "id": "llama-3.1-8b-instant" }
+          { "id": "llama-3.3-70b-versatile", "name": "llama-3.3-70b-versatile" },
+          { "id": "llama-3.1-8b-instant", "name": "llama-3.1-8b-instant" }
         ]
       }
     }
