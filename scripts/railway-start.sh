@@ -33,13 +33,17 @@ fi
 mkdir -p "$ROOT/workspace" "$ROOT/cron"
 echo "[DEBUG] workspace + cron dirs OK"
 
-# OpenClaw læser fra ~/.openclaw/openclaw.json – kopier til rigtig HOME (kør som root i Railway)
+# Kopier vores config til HOME/.openclaw/
 REAL_HOME="${HOME:-/root}"
 mkdir -p "$REAL_HOME/.openclaw" "$REAL_HOME/.openclaw/agents/main/sessions" "$REAL_HOME/.openclaw/credentials"
 cp "$ROOT/openclaw.json" "$REAL_HOME/.openclaw/openclaw.json"
 chmod 700 "$REAL_HOME/.openclaw" 2>/dev/null || true
 chmod 600 "$REAL_HOME/.openclaw/openclaw.json" 2>/dev/null || true
-echo "[DEBUG] REAL_HOME=$REAL_HOME config copied to $REAL_HOME/.openclaw/openclaw.json"
+echo "[DEBUG] Config copied to $REAL_HOME/.openclaw/openclaw.json"
+
+# Vis doctor help for at se tilgængelige flag
+echo "[DEBUG] doctor help:"
+npx openclaw doctor --help 2>&1 || true
 
 # Øg Node heap; vis stack trace ved exit og unhandled rejections
 [ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"
@@ -66,7 +70,7 @@ echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
-npx openclaw gateway run --port "$PORT" --bind loopback --allow-unconfigured --verbose 2>&1
+npx openclaw gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
 EXIT=$?
 echo "[EXIT] Gateway exited with code $EXIT"
 exit $EXIT
