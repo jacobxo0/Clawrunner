@@ -63,10 +63,25 @@ DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
-# Kør gateway
+# Find openclaw binary
+OPENCLAW_BIN=""
+if [ -f "$ROOT/node_modules/.bin/openclaw" ]; then
+  OPENCLAW_BIN="$ROOT/node_modules/.bin/openclaw"
+else
+  OPENCLAW_BIN="$(npx --no-install which openclaw 2>/dev/null || echo '')"
+fi
+echo "[DEBUG] openclaw bin: $OPENCLAW_BIN"
+
+# Kør gateway direkte via node for bedre fejloutput
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
-npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
+if [ -f "$ROOT/node_modules/openclaw/dist/cli.js" ]; then
+  echo "[DEBUG] Running via: node dist/cli.js"
+  node "$ROOT/node_modules/openclaw/dist/cli.js" gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
+else
+  echo "[DEBUG] Running via: npx openclaw"
+  npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
+fi
 EXIT=$?
 echo "[EXIT] Gateway exited with code $EXIT"
 exit $EXIT

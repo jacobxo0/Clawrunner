@@ -12,7 +12,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "groq/llama-3.3-70b-versatile"
+        "primary": "anthropic/claude-haiku-4-5-20251001"
       },
       "workspace": "./workspace",
       "compaction": {
