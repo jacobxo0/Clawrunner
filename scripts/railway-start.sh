@@ -88,9 +88,9 @@ echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
-# Print generated config for debugging
-echo "[DEBUG] Generated config models section:"
-node -e "try{const c=require('/app/.openclaw/openclaw.json');console.log(JSON.stringify(c.models,null,2));console.log('PRIMARY:',c.agents&&c.agents.defaults&&c.agents.defaults.model)}catch(e){console.error('Config read error:',e.message)}"
+# Print env vars for debugging
+echo "[DEBUG] GROQ_API_KEY set: $([ -n "$GROQ_API_KEY" ] && echo YES || echo NO)"
+echo "[DEBUG] TELEGRAM_BOT_TOKEN set: $([ -n "$TELEGRAM_BOT_TOKEN" ] && echo YES || echo NO)"
 
 # Kør gateway — al output (stdout+stderr) går direkte til Railway logs
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
