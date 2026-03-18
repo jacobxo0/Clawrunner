@@ -51,12 +51,15 @@ npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
 echo "[DEBUG] Config file location: ${HOME:-/root}/.openclaw/openclaw.json"
+echo "[DEBUG] GROQ_API_KEY is $([ -n "$GROQ_API_KEY" ] && echo 'set' || echo 'NOT SET')"
+echo "[DEBUG] TELEGRAM_BOT_TOKEN is $([ -n "$TELEGRAM_BOT_TOKEN" ] && echo 'set' || echo 'NOT SET')"
+echo "[DEBUG] BRAVE_API_KEY is $([ -n "$BRAVE_API_KEY" ] && echo 'set' || echo 'NOT SET')"
 
-# Kør openclaw doctor og dump output som hex for at se skjulte control codes
-echo "[DEBUG] Running openclaw doctor (hex dump)..."
+# Kør openclaw doctor
+echo "[DEBUG] Running openclaw doctor..."
 set +e
-NO_COLOR=1 FORCE_COLOR=0 npx openclaw doctor 2>&1 | head -c 3000 | od -c | head -80
-DOCTOR_EXIT=${PIPESTATUS[0]}
+NO_COLOR=1 FORCE_COLOR=0 npx openclaw doctor 2>&1
+DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
