@@ -59,8 +59,8 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
     }
     const out = JSON.stringify(cfg, null, 2);
     fs.writeFileSync('openclaw.json', out);
-    const apiKeyInFile = out.match(/"apiKey":\s*"([^"]{0,12})/);
-    console.log('[DEBUG] apiKey written:', apiKeyInFile ? apiKeyInFile[1]+'...' : 'not found');
+    const ki = out.indexOf('"apiKey"');
+    console.log('[DEBUG] apiKey snippet:', ki >= 0 ? out.substring(ki, ki+30) : 'not found');
   "
   echo "[DEBUG] openclaw.json genereret fra template."
 else
