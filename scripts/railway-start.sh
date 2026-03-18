@@ -69,14 +69,10 @@ npx openclaw doctor 2>&1 || true
 set -e
 echo "[DEBUG] Doctor done"
 
-# Tjek gateway help
-echo "[DEBUG] Gateway help:"
-npx openclaw gateway --help 2>&1 || true
-
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
-DEBUG="openclaw:*" npx openclaw gateway --port "$PORT" --allow-unconfigured 2>&1
+npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
 EXIT=$?
 echo "[EXIT] Gateway exited with code $EXIT"
 exit $EXIT
