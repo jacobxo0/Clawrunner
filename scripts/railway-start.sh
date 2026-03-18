@@ -23,45 +23,7 @@ export TELEGRAM_GROUP_ALLOW_FROM="${TELEGRAM_GROUP_ALLOW_FROM:-[]}"
 # Byg openclaw.json fra template ved at substituere ${VAR} fra env
 # Bruger Node så vi ikke afhænger af envsubst (gettext).
 if [ -f "$ROOT/openclaw.railway.example.json" ]; then
-  node -e "
-    const fs = require('fs');
-    let s = fs.readFileSync('openclaw.railway.example.json', 'utf8');
-    const env = process.env;
-    console.log('[DEBUG] node GROQ_API_KEY:', env.GROQ_API_KEY ? env.GROQ_API_KEY.substring(0,8)+'...' : 'UNDEFINED');
-    function repl(_, name) {
-      const v = env[name];
-      if (name === 'TELEGRAM_GROUP_ALLOW_FROM') return (v !== undefined && v !== '') ? v : '[]';
-      return v !== undefined ? v : '';
-    }
-    s = s.replace(/\$\{([^}]+)\}/g, repl);
-    let cfg = JSON.parse(s);
-    const telegramAllow = (env.TELEGRAM_GROUP_ALLOW_FROM && env.TELEGRAM_GROUP_ALLOW_FROM !== '') ? env.TELEGRAM_GROUP_ALLOW_FROM : '[]';
-    try {
-      let arr;
-      try {
-        const parsed = JSON.parse(telegramAllow);
-        arr = Array.isArray(parsed) ? parsed : [parsed];
-      } catch (_) {
-        arr = [telegramAllow];
-      }
-      arr = arr.map(function (id) { return String(id); });
-      if (cfg.channels && cfg.channels.telegram) {
-        cfg.channels.telegram.groupAllowFrom = arr;
-        cfg.channels.telegram.allowFrom = arr;
-      }
-    } catch (_) {}
-    if (!env.GROQ_API_KEY || env.GROQ_API_KEY === '') {
-      delete cfg.models;
-      if (cfg.agents && cfg.agents.defaults) {
-        cfg.agents.defaults.model = {};
-        if (cfg.agents.defaults.models) delete cfg.agents.defaults.models;
-      }
-    }
-    const out = JSON.stringify(cfg, null, 2);
-    fs.writeFileSync('openclaw.json', out);
-    const ki = out.indexOf('"apiKey"');
-    console.log('[DEBUG] apiKey snippet:', ki >= 0 ? out.substring(ki, ki+30) : 'not found');
-  "
+  node "$ROOT/scripts/build-config.js" "$ROOT"
   echo "[DEBUG] openclaw.json genereret fra template."
 else
   echo "[DEBUG] Advarsel: openclaw.railway.example.json ikke fundet."
@@ -91,23 +53,6 @@ export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn"
 echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
-
-# Print env vars for debugging
-echo "[DEBUG] GROQ_API_KEY set: $([ -n "$GROQ_API_KEY" ] && echo YES || echo NO)"
-echo "[DEBUG] TELEGRAM_BOT_TOKEN set: $([ -n "$TELEGRAM_BOT_TOKEN" ] && echo YES || echo NO)"
-
-# Validate and print generated config
-node -e "
-const fs = require('fs');
-try {
-  const raw = fs.readFileSync('.openclaw/openclaw.json','utf8');
-  const cfg = JSON.parse(raw);
-  console.log('[DEBUG] Config valid JSON, size=' + raw.length);
-  console.log('[DEBUG] models:', JSON.stringify(cfg.models));
-  console.log('[DEBUG] primary:', cfg.agents && cfg.agents.defaults && cfg.agents.defaults.model && cfg.agents.defaults.model.primary);
-  console.log('[DEBUG] telegram enabled:', cfg.channels && cfg.channels.telegram && cfg.channels.telegram.enabled);
-} catch(e) { console.error('[DEBUG] Config error:', e.message); }
-" 2>&1
 
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
