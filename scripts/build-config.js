@@ -32,15 +32,6 @@ if (cfg.channels && cfg.channels.telegram) {
   cfg.channels.telegram.allowFrom = arr;
 }
 
-// Remove models section if no Groq key
-if (!process.env.GROQ_API_KEY) {
-  delete cfg.models;
-  if (cfg.agents && cfg.agents.defaults) {
-    cfg.agents.defaults.model = {};
-    if (cfg.agents.defaults.models) delete cfg.agents.defaults.models;
-  }
-}
-
 fs.writeFileSync(dst, JSON.stringify(cfg, null, 2));
 
 // Debug output
