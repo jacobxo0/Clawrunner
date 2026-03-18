@@ -101,7 +101,7 @@
         }
       },
       "notion-api-integration": {
-        "enabled": true
+        "enabled": false
       },
       "ai-core": {
         "enabled": false

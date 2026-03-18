@@ -42,17 +42,32 @@ chmod 600 "$ROOT/.openclaw/openclaw.json" 2>/dev/null || true
 export HOME="$ROOT"
 echo "[DEBUG] .openclaw config dir OK OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR"
 
-# Doctor er diagnostik; kør ikke på hver start – kan blokere/exit i Railway og forhindre gateway-start
-# npx openclaw doctor --fix 2>/dev/null || true
-
 # Øg Node heap; vis uafviklede promise-afvisninger så vi ser fejl i logs
 [ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"
 export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn"
 
-# Tjek at openclaw findes (output i logs; fejler vi her, næste linje viser det)
+# Tjek at openclaw findes
 echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
+
+# Dump den genererede config (rediger apikeys ud for sikkerhed)
+echo "[DEBUG] Generated openclaw.json (sanitized):"
+node -e "
+const fs = require('fs');
+const cfg = JSON.parse(fs.readFileSync('$ROOT/.openclaw/openclaw.json','utf8'));
+if(cfg.tools&&cfg.tools.web&&cfg.tools.web.search) cfg.tools.web.search.apiKey='<redacted>';
+if(cfg.gateway&&cfg.gateway.auth) cfg.gateway.auth.token='<redacted>';
+if(cfg.channels&&cfg.channels.telegram) cfg.channels.telegram.botToken='<redacted>';
+console.log(JSON.stringify(cfg,null,2));
+" 2>&1 || true
+
+# Kør openclaw doctor for at se valideringsfejl
+echo "[DEBUG] Running openclaw doctor..."
+set +e
+npx openclaw doctor 2>&1 || true
+set -e
+echo "[DEBUG] Doctor done"
 
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
