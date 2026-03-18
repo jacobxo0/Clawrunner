@@ -27,6 +27,7 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
     const fs = require('fs');
     let s = fs.readFileSync('openclaw.railway.example.json', 'utf8');
     const env = process.env;
+    console.log('[DEBUG] node GROQ_API_KEY:', env.GROQ_API_KEY ? env.GROQ_API_KEY.substring(0,8)+'...' : 'UNDEFINED');
     function repl(_, name) {
       const v = env[name];
       if (name === 'TELEGRAM_GROUP_ALLOW_FROM') return (v !== undefined && v !== '') ? v : '[]';
