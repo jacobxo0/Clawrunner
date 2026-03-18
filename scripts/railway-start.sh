@@ -72,7 +72,7 @@ echo "[DEBUG] Doctor done"
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
-npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
+npx openclaw gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
 EXIT=$?
 echo "[EXIT] Gateway exited with code $EXIT"
 exit $EXIT
