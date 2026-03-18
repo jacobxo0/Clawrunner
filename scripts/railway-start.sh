@@ -94,5 +94,8 @@ echo "[DEBUG] TELEGRAM_BOT_TOKEN set: $([ -n "$TELEGRAM_BOT_TOKEN" ] && echo YES
 
 # Kør gateway — al output (stdout+stderr) går direkte til Railway logs
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
+set +e
 npx openclaw gateway --port "$PORT" --allow-unconfigured 2>&1
-echo "[EXIT] Gateway exited with code $?"
+EXIT=$?
+echo "[EXIT] Gateway exited with code $EXIT"
+exit $EXIT
