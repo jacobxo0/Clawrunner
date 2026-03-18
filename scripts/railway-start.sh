@@ -33,14 +33,13 @@ fi
 mkdir -p "$ROOT/workspace" "$ROOT/cron"
 echo "[DEBUG] workspace + cron dirs OK"
 
-# OpenClaw læser som standard fra ~/.openclaw/openclaw.json – sæt HOME så den finder vores config
-export OPENCLAW_CONFIG_DIR="$ROOT"
-mkdir -p "$ROOT/.openclaw" "$ROOT/.openclaw/agents/main/sessions" "$ROOT/.openclaw/credentials"
-cp "$ROOT/openclaw.json" "$ROOT/.openclaw/openclaw.json"
-chmod 700 "$ROOT/.openclaw" 2>/dev/null || true
-chmod 600 "$ROOT/.openclaw/openclaw.json" 2>/dev/null || true
-export HOME="$ROOT"
-echo "[DEBUG] .openclaw config dir OK OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR"
+# OpenClaw læser fra ~/.openclaw/openclaw.json – kopier til rigtig HOME (kør som root i Railway)
+REAL_HOME="${HOME:-/root}"
+mkdir -p "$REAL_HOME/.openclaw" "$REAL_HOME/.openclaw/agents/main/sessions" "$REAL_HOME/.openclaw/credentials"
+cp "$ROOT/openclaw.json" "$REAL_HOME/.openclaw/openclaw.json"
+chmod 700 "$REAL_HOME/.openclaw" 2>/dev/null || true
+chmod 600 "$REAL_HOME/.openclaw/openclaw.json" 2>/dev/null || true
+echo "[DEBUG] REAL_HOME=$REAL_HOME config copied to $REAL_HOME/.openclaw/openclaw.json"
 
 # Øg Node heap; vis stack trace ved exit og unhandled rejections
 [ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"

@@ -11,7 +11,9 @@
   },
   "agents": {
     "defaults": {
-      "model": {},
+      "model": {
+        "primary": "groq/llama-3.3-70b-versatile"
+      },
       "workspace": "./workspace",
       "compaction": {
         "mode": "safeguard"
@@ -41,7 +43,7 @@
   },
   "channels": {
     "telegram": {
-      "enabled": false,
+      "enabled": true,
       "dmPolicy": "pairing",
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "groupAllowFrom": [],
@@ -109,7 +111,7 @@
   "plugins": {
     "entries": {
       "telegram": {
-        "enabled": false
+        "enabled": true
       },
       "discord": {
         "enabled": false
