@@ -50,16 +50,7 @@ echo "[DEBUG] Checking openclaw..."
 npx openclaw --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
-# Dump den genererede config (rediger apikeys ud for sikkerhed)
-echo "[DEBUG] Generated openclaw.json (sanitized):"
-node -e "
-const fs = require('fs');
-const cfg = JSON.parse(fs.readFileSync('$ROOT/.openclaw/openclaw.json','utf8'));
-if(cfg.tools&&cfg.tools.web&&cfg.tools.web.search) cfg.tools.web.search.apiKey='<redacted>';
-if(cfg.gateway&&cfg.gateway.auth) cfg.gateway.auth.token='<redacted>';
-if(cfg.channels&&cfg.channels.telegram) cfg.channels.telegram.botToken='<redacted>';
-console.log(JSON.stringify(cfg,null,2));
-" 2>&1 || true
+echo "[DEBUG] Config file location: ${HOME:-/root}/.openclaw/openclaw.json"
 
 # Kør openclaw doctor for at se valideringsfejl
 echo "[DEBUG] Running openclaw doctor..."
@@ -72,7 +63,7 @@ echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
-CI=true DEBUG="*" npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1 | head -500
+npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
 EXIT=$?
 echo "[EXIT] Gateway exited with code $EXIT"
 exit $EXIT
