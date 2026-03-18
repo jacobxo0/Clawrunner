@@ -65,9 +65,10 @@ console.log(JSON.stringify(cfg,null,2));
 # Kør openclaw doctor for at se valideringsfejl
 echo "[DEBUG] Running openclaw doctor..."
 set +e
-npx openclaw doctor 2>&1 || true
+NO_COLOR=1 FORCE_COLOR=0 npx openclaw doctor 2>&1 | cat
+DOCTOR_EXIT=${PIPESTATUS[0]}
 set -e
-echo "[DEBUG] Doctor done"
+echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
