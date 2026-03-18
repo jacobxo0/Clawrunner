@@ -52,10 +52,10 @@ echo "[DEBUG] openclaw check done"
 
 echo "[DEBUG] Config file location: ${HOME:-/root}/.openclaw/openclaw.json"
 
-# Kør openclaw doctor for at se valideringsfejl
-echo "[DEBUG] Running openclaw doctor..."
+# Kør openclaw doctor og dump output som hex for at se skjulte control codes
+echo "[DEBUG] Running openclaw doctor (hex dump)..."
 set +e
-NO_COLOR=1 FORCE_COLOR=0 npx openclaw doctor 2>&1 | cat
+NO_COLOR=1 FORCE_COLOR=0 npx openclaw doctor 2>&1 | head -c 3000 | od -c | head -80
 DOCTOR_EXIT=${PIPESTATUS[0]}
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
