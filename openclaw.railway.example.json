@@ -11,9 +11,7 @@
   },
   "agents": {
     "defaults": {
-      "model": {
-        "primary": "groq/llama-3.3-70b-versatile"
-      },
+      "model": {},
       "workspace": "./workspace",
       "compaction": {
         "mode": "safeguard"
