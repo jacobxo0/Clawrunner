@@ -42,9 +42,9 @@ chmod 600 "$ROOT/.openclaw/openclaw.json" 2>/dev/null || true
 export HOME="$ROOT"
 echo "[DEBUG] .openclaw config dir OK OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR"
 
-# Øg Node heap; vis uafviklede promise-afvisninger så vi ser fejl i logs
+# Øg Node heap; vis stack trace ved exit og unhandled rejections
 [ -n "$NODE_OPTIONS" ] || export NODE_OPTIONS="--max-old-space-size=1024"
-export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn"
+export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn --trace-exit"
 
 # Tjek at openclaw findes
 echo "[DEBUG] Checking openclaw..."
