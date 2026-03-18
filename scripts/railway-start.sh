@@ -59,6 +59,10 @@ echo "[DEBUG] GROQ_API_KEY is $([ -n "$GROQ_API_KEY" ] && echo 'set' || echo 'NO
 echo "[DEBUG] TELEGRAM_BOT_TOKEN is $([ -n "$TELEGRAM_BOT_TOKEN" ] && echo 'set' || echo 'NOT SET')"
 echo "[DEBUG] BRAVE_API_KEY is $([ -n "$BRAVE_API_KEY" ] && echo 'set' || echo 'NOT SET')"
 
+# Vis crash location fra --trace-exit (entry.js:372)
+echo "[DEBUG] entry.js lines 360-385:"
+sed -n '360,385p' "$ROOT/node_modules/openclaw/dist/entry.js" 2>&1 || echo "entry.js not found"
+
 # Kør openclaw doctor
 echo "[DEBUG] Running openclaw doctor..."
 set +e
