@@ -32,8 +32,8 @@ if (cfg.channels && cfg.channels.telegram) {
   cfg.channels.telegram.allowFrom = arr;
 }
 
-// Remove models section always for now (debug: test if gateway starts without models)
-if (true || !process.env.GROQ_API_KEY) {
+// Remove models section if no Groq key
+if (!process.env.GROQ_API_KEY) {
   delete cfg.models;
   if (cfg.agents && cfg.agents.defaults) {
     cfg.agents.defaults.model = {};
