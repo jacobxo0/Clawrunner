@@ -57,7 +57,10 @@ if [ -f "$ROOT/openclaw.railway.example.json" ]; then
         if (cfg.agents.defaults.models) delete cfg.agents.defaults.models;
       }
     }
-    fs.writeFileSync('openclaw.json', JSON.stringify(cfg, null, 2));
+    const out = JSON.stringify(cfg, null, 2);
+    fs.writeFileSync('openclaw.json', out);
+    const apiKeyInFile = out.match(/"apiKey":\s*"([^"]{0,12})/);
+    console.log('[DEBUG] apiKey written:', apiKeyInFile ? apiKeyInFile[1]+'...' : 'not found');
   "
   echo "[DEBUG] openclaw.json genereret fra template."
 else
