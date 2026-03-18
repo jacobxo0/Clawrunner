@@ -94,11 +94,7 @@
   "skills": {
     "entries": {
       "github": {
-        "enabled": true,
-        "env": {
-          "GITHUB_TOKEN": "${GITHUB_TOKEN}",
-          "GITHUB_USERNAME": "${GITHUB_USERNAME}"
-        }
+        "enabled": false
       },
       "notion-api-integration": {
         "enabled": false
