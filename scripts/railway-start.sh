@@ -92,7 +92,20 @@ echo "[DEBUG] openclaw check done"
 echo "[DEBUG] GROQ_API_KEY set: $([ -n "$GROQ_API_KEY" ] && echo YES || echo NO)"
 echo "[DEBUG] TELEGRAM_BOT_TOKEN set: $([ -n "$TELEGRAM_BOT_TOKEN" ] && echo YES || echo NO)"
 
-# Kør gateway — al output (stdout+stderr) går direkte til Railway logs
+# Validate and print generated config
+node -e "
+const fs = require('fs');
+try {
+  const raw = fs.readFileSync('.openclaw/openclaw.json','utf8');
+  const cfg = JSON.parse(raw);
+  console.log('[DEBUG] Config valid JSON, size=' + raw.length);
+  console.log('[DEBUG] models:', JSON.stringify(cfg.models));
+  console.log('[DEBUG] primary:', cfg.agents && cfg.agents.defaults && cfg.agents.defaults.model && cfg.agents.defaults.model.primary);
+  console.log('[DEBUG] telegram enabled:', cfg.channels && cfg.channels.telegram && cfg.channels.telegram.enabled);
+} catch(e) { console.error('[DEBUG] Config error:', e.message); }
+" 2>&1
+
+# Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
 npx openclaw gateway --port "$PORT" --allow-unconfigured 2>&1
