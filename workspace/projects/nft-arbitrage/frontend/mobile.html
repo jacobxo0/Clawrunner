@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>OpenClaw · Mobil</title>
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --card: #1a1a1f;
+      --text: #e4e4e7;
+      --accent: #22c55e;
+      --warn: #eab308;
+      --muted: #71717a;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: max(1rem, var(--safe-top)) 1rem max(1.5rem, var(--safe-bottom));
+      line-height: 1.45;
+      min-height: 100dvh;
+      -webkit-tap-highlight-color: transparent;
+    }
+    h1 { font-size: 1.35rem; margin: 0 0 0.5rem; color: var(--accent); }
+    .sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    section {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid #2a2a35;
+    }
+    section h2 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 0.75rem;
+    }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #252530; }
+    .row:last-child { border-bottom: none; }
+    .row .k { color: var(--muted); font-size: 0.9rem; }
+    .row .v { font-weight: 600; font-size: 1.05rem; }
+    .row .v.green { color: var(--accent); }
+    .row .v.warn { color: var(--warn); }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      margin-top: 0.75rem;
+      background: #252530;
+      color: var(--text);
+      border: 1px solid #3a3a4a;
+      border-radius: 10px;
+      font-size: 1rem;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { background: #2a2a38; }
+    .btn.primary { background: var(--accent); color: #0f0f12; border-color: var(--accent); }
+    .links { display: flex; flex-direction: column; gap: 0.5rem; }
+    .links a {
+      display: block;
+      padding: 0.85rem 1rem;
+      background: #252530;
+      color: var(--accent);
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .links a:active { background: #2a2a38; }
+    .status { font-size: 0.9rem; color: var(--muted); margin-top: 1rem; }
+    .error { color: #ef4444; font-size: 0.9rem; }
+    .pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: p 2s infinite; }
+    .pulse.off { background: var(--muted); animation: none; }
+    @keyframes p { 0%,100%{ opacity:1 } 50%{ opacity:0.4 } }
+  </style>
+</head>
+<body>
+  <h1>OpenClaw</h1>
+  <p class="sub">Trading &amp; status på telefonen</p>
+
+  <section>
+    <h2>Backend status</h2>
+    <div id="backend-row" class="row">
+      <span class="k">API</span>
+      <span class="v" id="backend-status"><span class="pulse off"></span> Henter…</span>
+    </div>
+    <div class="row"><span class="k">Wallet (ETH)</span><span class="v" id="wallet">–</span></div>
+    <div class="row"><span class="k">Trades total</span><span class="v" id="trades">–</span></div>
+    <div class="row"><span class="k">Profit (ETH)</span><span class="v green" id="profit">–</span></div>
+    <div class="row"><span class="k">Tab i træk</span><span class="v" id="consecutive">–</span></div>
+    <button type="button" class="btn" id="btn-refresh">Opdater</button>
+  </section>
+
+  <section>
+    <h2>Backend-URL</h2>
+    <p class="row"><span class="k">Hvis du åbner uden for backend, sæt URL her (fx <code>http://192.168.1.5:8000</code>):</span></p>
+    <input type="url" id="api-url" placeholder="http://din-pc-ip:8000" style="width:100%;padding:0.75rem;margin-top:0.5rem;background:#252530;border:1px solid #3a3a4a;border-radius:8px;color:var(--text);font-size:1rem;">
+    <button type="button" class="btn" id="btn-save-url">Gem og opdater</button>
+  </section>
+
+  <section>
+    <h2>Links</h2>
+    <div class="links">
+      <a href="/docs" target="_blank">API docs</a>
+      <a href="/" target="_blank">Dashboard (desktop)</a>
+    </div>
+  </section>
+
+  <p class="status" id="foot">Telefon: åbn <strong>http://[din-PC-IP]:8000/mobile</strong> (samme WiFi).</p>
+
+  <script>
+(function() {
+  var stored = localStorage.getItem('openclaw_api');
+  var base = (window.location.port === '8000' && window.location.pathname.indexOf('/mobile') !== -1)
+    ? (window.location.origin + '/api')
+    : (stored || 'http://localhost:8000/api');
+  var apiUrlInput = document.getElementById('api-url');
+  if (apiUrlInput) {
+    apiUrlInput.value = stored ? stored.replace('/api','') : '';
+    document.getElementById('btn-save-url').addEventListener('click', function() {
+      var u = apiUrlInput.value.trim().replace(/\/+$/, '');
+      if (u) { localStorage.setItem('openclaw_api', u + '/api'); location.reload(); }
+    });
+  }
+
+  function el(id) { return document.getElementById(id); }
+  function setBackend(ok, msg) {
+    var s = el('backend-status');
+    s.innerHTML = ok ? '<span class="pulse"></span> Kører' : '<span class="pulse off"></span> ' + (msg || 'Ingen forbindelse');
+  }
+  function setWallet(v) { el('wallet').textContent = v != null ? v.toFixed(4) : '–'; }
+  function setTrades(v) { el('trades').textContent = v != null ? String(v) : '–'; }
+  function setProfit(v) { el('profit').textContent = v != null ? v.toFixed(4) : '–'; }
+  function setConsecutive(v) {
+    var elm = el('consecutive');
+    elm.textContent = v != null ? String(v) : '–';
+    elm.className = (v && v >= 3) ? 'v warn' : 'v';
+  }
+
+  function fetchStatus() {
+    setBackend(false, 'Henter…');
+    fetch(base + '/mobile-status', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        setBackend(true);
+        setWallet(d.wallet_balance_eth);
+        setTrades(d.total_trades);
+        setProfit(d.total_profit_eth);
+        setConsecutive(d.consecutive_losses);
+      })
+      .catch(function() {
+        setBackend(false, 'Kan ikke nå backend');
+        setWallet(null);
+        setTrades(null);
+        setProfit(null);
+        setConsecutive(null);
+      });
+  }
+
+  el('btn-refresh').addEventListener('click', fetchStatus);
+  fetchStatus();
+})();
+  </script>
+</body>
+</html>

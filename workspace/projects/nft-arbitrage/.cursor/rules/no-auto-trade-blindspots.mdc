@@ -1,0 +1,56 @@
+---
+description: Hard-earned lessons about automated trading viability. MUST be consulted before building or suggesting any auto-trade system.
+alwaysApply: true
+---
+
+# Auto-Trade Reality Check — Mandatory Before Any Trading System
+
+## Core Truth
+
+There is NO automated arbitrage strategy that generates meaningful profit with < $5,000 capital. This is an economic reality, not a technical problem. Do not attempt to code around it.
+
+## Why Auto-Trade Fails on Small Capital
+
+1. **Fees eat the spread** — Every marketplace charges 2-15% seller fees. Real spreads between platforms are 1-5% on liquid items. Net after fees = negative.
+2. **Trade locks add price risk** — Steam (7 days), NFT marketplaces (gas + confirmation time). Price moves during lock period destroy margins.
+3. **Platforms ban automation** — Steam, OpenSea, bookmakers all actively detect and ban bots. Losing an account = losing inventory.
+4. **API data is misleading** — Bid prices shown by APIs (e.g., OpenSea `price.value`) are gross values. Actual seller proceeds after fees, royalties, and protocol deductions can be 50-70% lower. NEVER trust face-value API prices as profit calculations.
+5. **Competition is institutional** — Any market with real spreads is already dominated by firms with millions in capital and nanosecond execution.
+
+## Proven Failures (Do NOT Revisit)
+
+- **NFT bid-spread arbitrage** — Tested with real money. Lost ~$67 of $120 deposit. OpenSea bids are gross values; actual seller proceeds are far lower. Cheap collections have disproportionately high fee impact.
+- **CS2/Steam skin arbitrage** — 7-day trade lock, 15% Steam fee, Buff163 requires Chinese ID/Alipay. Not viable from Denmark.
+- **Sports betting arbitrage** — Accounts get banned within 2-4 weeks.
+- **DEX/Uniswap arbitrage** — Requires MEV bots and millions in capital.
+- **Forex arbitrage** — Zero spread. Institutional dominated.
+- **Ticket resale** — Illegal in Denmark (Sortbørsloven).
+
+## Before Building ANY Trading/Arbitrage System
+
+STOP and answer these questions honestly:
+
+1. What is the ACTUAL spread after ALL fees on both sides?
+2. Is there a time lock between buy and sell? What is the price risk during that period?
+3. Can you withdraw profit as real money (not platform credit)?
+4. Does the platform TOS allow automation? What happens if banned?
+5. What is the minimum capital needed for the profit to exceed fees?
+6. Who is your competition — individuals or institutions?
+7. Have you verified the math with REAL transaction data, not API face values?
+
+If ANY answer is unfavorable, do NOT proceed. Inform the user honestly.
+
+## What IS Viable
+
+- **Monitoring/alerting tools** — Watch markets, send alerts, let humans decide
+- **Analytics dashboards** — Provide data others don't have (wash detection, whale tracking)
+- **SaaS products** — Sell the tool, not the trades
+- **Freelance automation** — Use Python/API skills to build for paying clients
+
+## Agent Behavior
+
+- NEVER suggest auto-trade systems without first running through the checklist above
+- NEVER present optimistic profit projections without subtracting ALL fees, gas, slippage, and time risk
+- ALWAYS show worst-case math, not best-case
+- ALWAYS disclose if a strategy has been tested and failed
+- If the user asks to build a trading bot, present this reality check FIRST before writing any code

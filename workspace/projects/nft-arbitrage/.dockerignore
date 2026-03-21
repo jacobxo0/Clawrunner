@@ -1,0 +1,30 @@
+# Never bake secrets into the image
+.env
+.env.*
+
+# Git and IDE
+.git
+.gitignore
+.cursor
+*.md
+!DEPLOY.md
+
+# Python
+__pycache__
+*.py[cod]
+.pytest_cache
+.venv
+venv
+env
+
+# Data and DB (use volume on host)
+*.db
+data/
+
+# Tests and scripts (not needed in production image)
+tests/
+scripts/
+
+# Optional
+node_modules/
+.claude/

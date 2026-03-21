@@ -1,0 +1,358 @@
+# NFT Arbitrage OS - Main Configuration
+
+system:
+  name: "NFT Arbitrage OS"
+  version: "0.1.0"
+  environment: "development"
+  log_level: "INFO"
+
+# Collections to track — sorted by floor price (cheapest first)
+# System auto-skips collections above wallet balance
+collections:
+  # ── Tier 1: Ultra-cheap (< 0.02 ETH) — tradeable NOW ──
+  - slug: "cryptocoven"
+    name: "Crypto Coven"
+    chain: "ethereum"
+    contract: "0x5180db8F5c931aaE63c74266b211F580155ecac8"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "tubby-cats"
+    name: "Tubby Cats"
+    chain: "ethereum"
+    contract: "0xCa7cA7BcC765F77339bE2d648BA53ce9c8a262bD"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "thememes6529"
+    name: "The Memes by 6529"
+    chain: "ethereum"
+    contract: "0x33fd426905f149f8376e227d0c9d3340aad17af1"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "gemesis"
+    name: "Gemesis"
+    chain: "ethereum"
+    contract: "0xbe9371326f91345777b04394448c23e2bfeaa826"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "linksdao"
+    name: "LinksDAO"
+    chain: "ethereum"
+    contract: "0x696115768bbef67be8bd408d760332a7efbee92d"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  # ── Tier 2: Cheap (0.02 - 0.05 ETH) — tradeable NOW ──
+  - slug: "based-onchain-dinos"
+    name: "Based Onchain Dinos"
+    chain: "base"
+    contract: "0xd4c5292b9689238f0a51c8505b1d1d6714ce95a0"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "m"
+    name: "merge."
+    chain: "ethereum"
+    contract: "0xc3f8a0f5841abff777d3eefa5047e8d413a1c9ab"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "sandbox"
+    name: "The Sandbox LANDs"
+    chain: "ethereum"
+    contract: "0x5cc5b05a8a13e3fbdb0bb9fccd98d38e50f90c38"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "fwogs"
+    name: "fwogs"
+    chain: "ethereum"
+    contract: "0x8fe1a377b83921fe1429adb1b8fbfecd45de9cd8"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "beanzofficial"
+    name: "BEANZ Official"
+    chain: "ethereum"
+    contract: "0x306b1ea3ecdf94ab739f1910bbda052ed4a9f949"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  # ── Tier 3: Mid (0.05 - 0.15 ETH) — unlocks with profit ──
+  - slug: "opepen-edition"
+    name: "Opepen Edition"
+    chain: "ethereum"
+    contract: "0x6339e5E072086621540D0362C4e3Cea0d643E114"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "invisiblefriends"
+    name: "Invisible Friends"
+    chain: "ethereum"
+    contract: "0x59468516a8259058baD1cA5F8f4BFF190d30E066"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "nakamigos"
+    name: "Nakamigos"
+    chain: "ethereum"
+    contract: "0xd774557b647330c91bf44cfeab205095f7e6c367"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  # ── Tier 4: Blue chips — unlocks as balance grows ──
+  - slug: "azuki"
+    name: "Azuki"
+    chain: "ethereum"
+    contract: "0xED5AF388653567Af2F388E6224dC7C4b3241C544"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "milady"
+    name: "Milady Maker"
+    chain: "ethereum"
+    contract: "0x5Af0D9827E0c53E4799BB226655A1de152A425a5"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+  - slug: "pudgypenguins"
+    name: "Pudgy Penguins"
+    chain: "ethereum"
+    contract: "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
+    royalty_bps: 500
+    marketplace_fee_bps: 250
+    active: true
+
+# Data ingestion settings
+# Primary: OpenSea API v2 (listings, bids, stats, events)
+# Secondary: Blur API (bid pools, listings, floor prices)
+# Tertiary: Moralis API v2.2 (trades, analytics, ownership)
+ingestion:
+  opensea:
+    base_url: "https://api.opensea.io"
+    chain: "ethereum"
+    rate_limit_per_second: 4
+    batch_size: 50
+
+  blur:
+    base_url: "https://core-api.prod.blur.io"
+    enabled: true
+    rate_limit_per_second: 3
+    batch_size: 30
+
+  moralis:
+    base_url: "https://deep-index.moralis.io/api/v2.2"
+    chain: "eth"
+    rate_limit_per_second: 5
+    daily_cu_limit: 40000
+
+  dune:
+    base_url: "https://api.dune.com/api/v1"
+    wash_trade_query_id: null
+
+# Cost engine parameters (enhanced with dynamic gas)
+cost_engine:
+  default_risk_buffer_pct: 0.02
+  gas_buffer_multiplier: 1.3
+  min_net_profit_eth: 0.003
+  min_roi: 0.015
+  # Dynamic gas: uses real estimates per tx type (replaces fixed 200k)
+  gas_units: 340000     # atomic arb (buy+sell) estimate
+  gas_units_buy: 160000 # single Seaport buy
+  gas_units_sell: 180000 # single Seaport sell/accept offer
+
+# Strategy configurations
+strategies:
+  bid_spread:
+    enabled: true
+    min_roi: 0.02
+    min_net_profit_eth: 0.003
+    min_confidence: 0.55
+    min_bid_depth: 2
+    max_listing_age_hours: 168
+    scan_interval_seconds: 15
+
+  # NEW: Cross-marketplace arbitrage (OpenSea ↔ Blur)
+  # THE competitive edge: exploit price gaps between marketplaces
+  cross_marketplace:
+    enabled: true
+    min_roi_pct: 1.0
+    min_profit_eth: 0.002
+    blur_fee_bps: 50
+    scan_interval_seconds: 12
+
+  stale_listing:
+    enabled: true
+    min_stale_hours: 12
+    floor_increase_pct: 0.08
+    min_liquidity_score: 0.3
+    scan_interval_seconds: 30
+
+  # ENABLED: Trait mispricing — find rare NFTs listed at floor price
+  trait_mispricing:
+    enabled: true
+    min_trait_premium_pct: 12.0
+    min_sales_for_trait: 2
+    min_profit_eth: 0.003
+    min_roi_pct: 4.0
+    scan_interval_seconds: 30
+
+  # NEW: Sweep detection — front-run ongoing sweeps
+  sweep_front_run:
+    enabled: true
+    min_sweep_count: 2
+    sweep_window_minutes: 15
+    min_profit_eth: 0.002
+    min_roi_pct: 2.5
+    floor_lift_estimate_pct: 12.0
+    scan_interval_seconds: 10
+
+# Risk management
+risk:
+  max_total_exposure_eth: 5.0
+  max_collection_exposure_eth: 2.0
+  max_daily_loss_eth: 0.5
+  max_open_positions: 10
+  max_single_trade_eth: 1.0
+  stop_loss_pct: 0.15
+  max_wash_score: 0.6
+  min_liquidity_score: 0.3
+  # Stop auto-execute after N consecutive losing trades (0 = disabled)
+  consecutive_loss_limit: 3
+
+# Self-improvement
+self_improvement:
+  strategy_selector:
+    algorithm: "thompson_sampling"
+    initial_alpha: 1.0
+    initial_beta: 1.0
+    min_trades_before_reallocation: 10
+
+  parameter_tuner:
+    enabled: true
+    review_interval_hours: 24
+    lookback_days: 7
+    tighten_on_hit_rate_below: 0.5
+    loosen_on_hit_rate_above: 0.75
+
+  meta_learning:
+    enabled: true
+    review_interval_hours: 168
+    ai_provider: "anthropic"
+    auto_apply_confidence_threshold: 0.8
+
+# Trend scoring weights
+trend_scoring:
+  weights:
+    smart_money_flow: 0.20
+    bid_depth_change: 0.18
+    social_momentum: 0.15
+    listing_structure: 0.12
+    volume_quality: 0.10
+    unique_buyer_ratio: 0.10
+    floor_momentum: 0.08
+    whale_accumulation: 0.07
+
+# Wash trade detection
+wash_detection:
+  weights:
+    self_trade_ratio: 0.25
+    top10_concentration: 0.20
+    hold_time_inverse: 0.15
+    fake_bid_ratio: 0.15
+    short_hold_pct: 0.10
+    price_clustering: 0.05
+    dune_wash_pct: 0.10
+
+# Execution — FULL AUTO MODE
+# The system only buys when a verified buyer (active bid) already exists.
+# This is demand-driven: no buyer = no buy.
+execution:
+  mode: "full_auto"
+  use_flashbots: true
+  max_gas_gwei: 50
+  tx_timeout_seconds: 120
+  auto_execute_confidence_min: 0.70
+  # Auto-execute strategies where exit is guaranteed (bid exists)
+  auto_strategies:
+    - "bid_spread"
+    - "cross_marketplace"  # Guaranteed exit via bid on other marketplace
+  # Safety: max ETH per single auto-trade
+  max_single_trade_eth: 1.0
+  # Re-verify bid before buying (critical safety check)
+  verify_bid_before_buy: true
+  # Minimum bid tolerance (accept bids within 2% of expected exit)
+  bid_tolerance_pct: 2.0
+
+# Notifications — Telegram for all important events
+notifications:
+  telegram:
+    enabled: true
+    notify_on_opportunity: true
+    notify_on_trade: true           # Every buy/sell gets a message
+    notify_on_error: true           # Critical errors
+    notify_on_daily_summary: true   # Daily P&L report
+    notify_on_trend_shift: true     # When trend changes significantly
+    notify_on_risk_warning: true    # When risk limits are approached
+    notify_on_parameter_change: true  # When auto-tuner adjusts params
+
+# Dynamic relisting — Dutch auction price decay for held inventory
+relisting:
+  initial_markup_pct: 15.0
+  decay_rate_per_hour: 1.0
+  min_price_floor_pct: -5.0
+  check_interval_minutes: 30
+  max_hold_hours: 48
+
+# Anti-bot camouflage — evade marketplace bot detection
+camouflage:
+  enabled: true
+  min_delay_ms: 300
+  max_delay_ms: 2500
+
+# Observation loop — konstant observation lagres som viden (til forecast-gate)
+observation_loop:
+  enabled: true
+  max_collections_per_cycle: 30
+
+# Forecast gate — kun trade hvor vi kan forecast mindst lige så godt som andre med succes
+forecast_gate:
+  min_benchmark_hit_rate: 0.55
+  min_sample_size: 5
+  allow_if_insufficient_data: true
+  lookback_days: 90
+  spread_tolerance_pct: 1.0
+  bid_depth_tolerance: 2
+
+# Scheduling — STEROIDS MODE
+scheduling:
+  ingestion_interval_seconds: 7
+  opportunity_scan_seconds: 12
+  observation_loop_seconds: 45
+  risk_update_minutes: 10
+  cleanup_hours: 4
+  daily_report_hour: 8
+  meta_learning_day: "monday"
+  alpha_discovery_minutes: 20
+  whale_tracker_minutes: 30
+  gas_update_seconds: 20
+  relist_check_minutes: 15
+  portfolio_check_minutes: 30

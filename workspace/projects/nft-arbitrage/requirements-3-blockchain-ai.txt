@@ -1,0 +1,7 @@
+# Batch 3 — Blockchain, AI, notifikationer. Efter batch 2.
+web3>=7.6.0
+eth-account>=0.13.0
+anthropic>=0.39.0
+openai>=1.55.0
+python-telegram-bot>=22.6
+redis>=5.2.0

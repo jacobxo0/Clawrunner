@@ -1,0 +1,34 @@
+# NFT Arbitrage OS — run on VPS 24/7
+# Usage: copy project + .env to VPS, then: docker compose up -d
+
+services:
+  app:
+    build: .
+    container_name: nft-arb-app
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist SQLite DB and any local config overrides
+      - ./data:/app/data
+    environment:
+      # Persist DB in ./data on host (create dir first: mkdir -p data)
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/nft_arbitrage.db
+    # Optional: use Redis on VPS for better cache
+    # depends_on:
+    #   - redis
+    # environment:
+    #   - REDIS_URL=redis://redis:6379/0
+
+  # Uncomment to run Redis (faster cache, fewer API re-fetches)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: nft-arb-redis
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis_data:/data
+  #   command: redis-server --appendonly yes
+
+# volumes:
+#   redis_data:

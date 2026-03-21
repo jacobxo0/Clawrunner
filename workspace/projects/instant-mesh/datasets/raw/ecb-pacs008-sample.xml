@@ -1,0 +1,92 @@
+<!-- Synthetic pacs.008.001.08 SCT Inst sample derived from ECB TIPS Annex 6 structure. Values anonymised. -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
+  <FIToFICstmrCdtTrf>
+    <GrpHdr>
+      <MsgId>IMESH-TIPS-20240228-0001</MsgId>
+      <CreDtTm>2026-02-28T19:03:11Z</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <SttlmInf>
+        <SttlmMtd>CLRG</SttlmMtd>
+        <ClrSys>
+          <Prtry>TIPS</Prtry>
+        </ClrSys>
+      </SttlmInf>
+      <InstgAgt>
+        <FinInstnId>
+          <BICFI>IMESDK21XXX</BICFI>
+        </FinInstnId>
+      </InstgAgt>
+      <InstdAgt>
+        <FinInstnId>
+          <BICFI>RKDKDKKKXXX</BICFI>
+        </FinInstnId>
+      </InstdAgt>
+    </GrpHdr>
+    <CdtTrfTxInf>
+      <PmtId>
+        <InstrId>IMESH-DK-84005421</InstrId>
+        <EndToEndId>E2E-APP-20240228-93810</EndToEndId>
+        <TxId>RTX-44770011</TxId>
+      </PmtId>
+      <PmtTpInf>
+        <InstrPrty>HIGH</InstrPrty>
+        <SvcLvl>
+          <Prtry>SCTInst</Prtry>
+        </SvcLvl>
+        <LclInstrm>
+          <Prtry>INST</Prtry>
+        </LclInstrm>
+        <CtgyPurp>
+          <Prtry>CASHM</Prtry>
+        </CtgyPurp>
+      </PmtTpInf>
+      <IntrBkSttlmAmt Ccy="EUR">1750.15</IntrBkSttlmAmt>
+      <IntrBkSttlmDt>2026-02-28</IntrBkSttlmDt>
+      <ChrgBr>SLEV</ChrgBr>
+      <Dbtr>
+        <Nm>Nordic Mobility ApS</Nm>
+        <PstlAdr>
+          <Ctry>DK</Ctry>
+          <AdrLine>Frederiksgade 27</AdrLine>
+          <AdrLine>8000 Aarhus C</AdrLine>
+        </PstlAdr>
+        <Id>
+          <OrgId>
+            <AnyBIC>IMESDK21XXX</AnyBIC>
+          </OrgId>
+        </Id>
+      </Dbtr>
+      <DbtrAcct>
+        <Id>
+          <IBAN>DK7220009999123456</IBAN>
+        </Id>
+      </DbtrAcct>
+      <DbtrAgt>
+        <FinInstnId>
+          <BICFI>IMESDK21XXX</BICFI>
+        </FinInstnId>
+      </DbtrAgt>
+      <CdtrAgt>
+        <FinInstnId>
+          <BICFI>RKDKDKKKXXX</BICFI>
+        </FinInstnId>
+      </CdtrAgt>
+      <Cdtr>
+        <Nm>Velox Retail GmbH</Nm>
+        <PstlAdr>
+          <Ctry>DE</Ctry>
+          <AdrLine>Spandauer Damm 42</AdrLine>
+          <AdrLine>14059 Berlin</AdrLine>
+        </PstlAdr>
+      </Cdtr>
+      <CdtrAcct>
+        <Id>
+          <IBAN>DE23500105170886453309</IBAN>
+        </Id>
+      </CdtrAcct>
+      <RmtInf>
+        <Ustrd>Invoice 4419 / March restock.</Ustrd>
+      </RmtInf>
+    </CdtTrfTxInf>
+  </FIToFICstmrCdtTrf>
+</Document>

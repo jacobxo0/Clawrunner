@@ -1,0 +1,7 @@
+# Batch 3 — Blockchain, WebSocket, retry, Telegram, Redis. ~2–4 min.
+web3>=7.6.0
+eth-account>=0.13.0
+websockets>=14.0
+tenacity>=9.0.0
+python-telegram-bot>=22.6
+redis>=5.2.0

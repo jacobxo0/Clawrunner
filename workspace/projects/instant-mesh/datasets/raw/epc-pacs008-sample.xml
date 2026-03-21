@@ -1,0 +1,77 @@
+<!-- Synthetic pacs.008 SCT Inst sample aligned with EPC 2024 SCT Inst Implementation Guidelines (Appendix A). -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.10">
+  <FIToFICstmrCdtTrf>
+    <GrpHdr>
+      <MsgId>EPC-IMESH-20240228-01</MsgId>
+      <CreDtTm>2026-02-28T18:45:02Z</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <SttlmInf>
+        <SttlmMtd>CLRG</SttlmMtd>
+        <ClrSys>
+          <Prtry>RT1</Prtry>
+        </ClrSys>
+      </SttlmInf>
+    </GrpHdr>
+    <CdtTrfTxInf>
+      <PmtId>
+        <InstrId>IG-20240228-000045</InstrId>
+        <EndToEndId>APP-SCEN-00212</EndToEndId>
+      </PmtId>
+      <IntrBkSttlmAmt Ccy="EUR">982.44</IntrBkSttlmAmt>
+      <ChrgBr>SLEV</ChrgBr>
+      <PmtTpInf>
+        <SvcLvl>
+          <Prtry>SCTInst</Prtry>
+        </SvcLvl>
+        <LclInstrm>
+          <Prtry>INST</Prtry>
+        </LclInstrm>
+        <CtgyPurp>
+          <Prtry>GDDS</Prtry>
+        </CtgyPurp>
+      </PmtTpInf>
+      <Dbtr>
+        <Nm>Coastal Devices BV</Nm>
+        <PstlAdr>
+          <Ctry>NL</Ctry>
+          <AdrLine>Keizersgracht 113</AdrLine>
+          <AdrLine>1015 CJ Amsterdam</AdrLine>
+        </PstlAdr>
+      </Dbtr>
+      <DbtrAcct>
+        <Id>
+          <IBAN>NL30INGB0006123456</IBAN>
+        </Id>
+      </DbtrAcct>
+      <DbtrAgt>
+        <FinInstnId>
+          <BICFI>INGBNL2AXXX</BICFI>
+        </FinInstnId>
+      </DbtrAgt>
+      <CdtrAgt>
+        <FinInstnId>
+          <BICFI>HANDDKKKXXX</BICFI>
+        </FinInstnId>
+      </CdtrAgt>
+      <Cdtr>
+        <Nm>Nordic Craft OY</Nm>
+        <PstlAdr>
+          <Ctry>FI</Ctry>
+          <AdrLine>Eteläesplanadi 18</AdrLine>
+          <AdrLine>00130 Helsinki</AdrLine>
+        </PstlAdr>
+      </Cdtr>
+      <CdtrAcct>
+        <Id>
+          <IBAN>FI0450000120345678</IBAN>
+        </Id>
+      </CdtrAcct>
+      <Purp>
+        <Cd>GDDS</Cd>
+      </Purp>
+      <RmtInf>
+        <Ustrd>Restock PO-5521 / rush</Ustrd>
+      </RmtInf>
+    </CdtTrfTxInf>
+  </FIToFICstmrCdtTrf>
+</Document>

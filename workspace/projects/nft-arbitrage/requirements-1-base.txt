@@ -1,0 +1,8 @@
+# Batch 1 — Base (let, ingen tunge builds). Kør først.
+pydantic>=2.9.0
+pydantic-settings>=2.6.0
+python-dotenv>=1.0.0
+structlog>=24.4.0
+pyyaml>=6.0.2
+tenacity>=9.0.0
+websockets>=14.0

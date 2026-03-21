@@ -1,0 +1,28 @@
+# Instant Payment Risk Mesh – task runner
+
+default:
+    @just --list
+
+# Start local infra (Redpanda + Postgres)
+infra-up:
+    docker compose -f infra/compose.redpanda.yml up -d
+
+infra-down:
+    docker compose -f infra/compose.redpanda.yml down
+
+# Backend
+install:
+    cd backend && pip install -e ".[dev]"
+
+test:
+    cd backend && pytest -v
+
+lint:
+    cd backend && ruff check . && mypy .
+
+fmt:
+    cd backend && ruff format .
+
+# Run API server
+serve:
+    cd backend && uvicorn app.main:app --reload --port 8000

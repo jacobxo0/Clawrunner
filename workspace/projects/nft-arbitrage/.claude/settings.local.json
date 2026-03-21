@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill:*)",
+      "Bash(python -c:*)",
+      "Bash(timeout 15 python:*)"
+    ]
+  }
+}

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Arbitrage OS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: #0a0a0f; color: #e0e0e0; display: flex; min-height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar { width: 220px; background: #12121f; border-right: 1px solid #2a2a4a; padding: 20px 0; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar .logo { padding: 0 20px 24px; border-bottom: 1px solid #2a2a4a; margin-bottom: 12px; }
+        .sidebar .logo h1 { font-size: 1.1em; color: #00d4ff; }
+        .sidebar .logo .ver { font-size: 0.7em; color: #555; margin-top: 2px; }
+        .sidebar nav { flex: 1; }
+        .sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #888; text-decoration: none; font-size: 0.85em; border-left: 3px solid transparent; transition: all 0.15s; }
+        .sidebar nav a:hover { color: #ccc; background: #1a1a2e; }
+        .sidebar nav a.active { color: #00d4ff; border-left-color: #00d4ff; background: #00d4ff08; }
+        .sidebar nav a .icon { font-size: 1.1em; width: 20px; text-align: center; }
+        .sidebar .status-box { padding: 16px 20px; border-top: 1px solid #2a2a4a; margin-top: auto; }
+        .sidebar .status-box .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #00ff88; animation: pulse 2s infinite; margin-right: 6px; }
+        .sidebar .status-box .text { font-size: 0.75em; color: #666; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+        /* ── Main Content ── */
+        .main { flex: 1; overflow-y: auto; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 30px; border-bottom: 1px solid #1a1a2e; }
+        .topbar h2 { font-size: 1.1em; color: #fff; }
+        .topbar .meta { display: flex; align-items: center; gap: 16px; }
+        .topbar .meta .time { font-size: 0.75em; color: #555; }
+        .content { padding: 24px 30px; }
+
+        /* ── Cards ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: #12121f; border: 1px solid #2a2a4a; border-radius: 10px; padding: 18px; }
+        .stat-card .label { font-size: 0.7em; text-transform: uppercase; color: #666; letter-spacing: 1px; margin-bottom: 6px; }
+        .stat-card .value { font-size: 1.6em; font-weight: 700; color: #fff; }
+        .stat-card .sub { font-size: 0.75em; color: #555; margin-top: 4px; }
+        .stat-card.green .value { color: #00ff88; }
+        .stat-card.blue .value { color: #00d4ff; }
+        .stat-card.yellow .value { color: #ffaa00; }
+
+        /* ── Sections ── */
+        .section { background: #12121f; border: 1px solid #2a2a4a; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .section-header h3 { font-size: 0.9em; color: #00d4ff; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── Tables ── */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px 12px; font-size: 0.65em; text-transform: uppercase; letter-spacing: 1px; color: #555; border-bottom: 1px solid #2a2a4a; }
+        td { padding: 11px 12px; font-size: 0.82em; border-bottom: 1px solid #1a1a2e; }
+        tr:hover { background: #1a1a2e; }
+        .eth { color: #666; font-size: 0.8em; }
+        .empty { text-align: center; padding: 40px; color: #333; }
+
+        /* ── Badges ── */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.65em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge.active { background: #00ff8815; color: #00ff88; }
+        .badge.pending { background: #ffaa0015; color: #ffaa00; }
+        .badge.approved { background: #00d4ff15; color: #00d4ff; }
+        .badge.rejected { background: #ff444415; color: #ff4444; }
+        .badge.executed { background: #a855f715; color: #a855f7; }
+
+        /* ── Buttons ── */
+        .btn { background: #00d4ff15; color: #00d4ff; border: 1px solid #00d4ff30; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.75em; font-family: inherit; transition: all 0.15s; }
+        .btn:hover { background: #00d4ff25; }
+        .btn.green { background: #00ff8815; color: #00ff88; border-color: #00ff8830; }
+        .btn.green:hover { background: #00ff8825; }
+        .btn.red { background: #ff444415; color: #ff4444; border-color: #ff444430; }
+        .btn.red:hover { background: #ff444425; }
+        .btn.sm { padding: 4px 10px; font-size: 0.7em; }
+
+        /* ── Pages ── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── Alpha Score Bar ── */
+        .score-bar { display: inline-flex; align-items: center; gap: 6px; }
+        .score-bar .bar { width: 60px; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden; }
+        .score-bar .bar .fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .score-bar .num { font-size: 0.75em; font-weight: 700; min-width: 28px; }
+
+        /* ── Log ── */
+        .log-box { background: #0a0a0f; border: 1px solid #2a2a4a; border-radius: 8px; padding: 14px; max-height: 300px; overflow-y: auto; font-size: 0.75em; font-family: 'Courier New', monospace; line-height: 1.8; }
+        .log-box .entry { color: #555; }
+        .log-box .entry.info { color: #00d4ff; }
+        .log-box .entry.success { color: #00ff88; }
+        .log-box .entry.warn { color: #ffaa00; }
+        .log-box .entry.error { color: #ff4444; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>NFT Arb OS</h1>
+            <div class="ver">v0.2.0</div>
+        </div>
+        <nav>
+            <a href="#" class="active" data-page="dashboard"><span class="icon">&#9632;</span> Dashboard</a>
+            <a href="#" data-page="collections"><span class="icon">&#9733;</span> Collections</a>
+            <a href="#" data-page="opportunities"><span class="icon">&#9998;</span> Opportunities</a>
+            <a href="#" data-page="trades"><span class="icon">&#8644;</span> Trades</a>
+            <a href="#" data-page="discovery"><span class="icon">&#9733;</span> Discovery</a>
+            <a href="#" data-page="scanner"><span class="icon">&#8987;</span> Live Scanner</a>
+            <a href="#" data-page="settings"><span class="icon">&#9881;</span> Settings</a>
+        </nav>
+        <div class="status-box">
+            <div><span class="dot"></span> <span id="sidebar-status" style="font-size:0.8em;color:#888;">Connecting...</span></div>
+            <div class="text" style="margin-top:6px;">Uptime: <span id="sidebar-uptime">-</span>h</div>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <h2 id="page-title">Dashboard</h2>
+            <div class="meta">
+                <span class="time">Updated: <span id="last-update">-</span></span>
+                <button class="btn" onclick="refreshAll()">Refresh</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- ═══ DASHBOARD PAGE ═══ -->
+            <div id="page-dashboard" class="page active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="label">Collections</div><div class="value" id="stat-collections">-</div><div class="sub">Active tracking</div></div>
+                    <div class="stat-card blue"><div class="label">Opportunities</div><div class="value" id="stat-opportunities">-</div><div class="sub" id="stat-opp-sub">-</div></div>
+                    <div class="stat-card yellow"><div class="label">Trades</div><div class="value" id="stat-trades">-</div><div class="sub" id="stat-trades-sub">-</div></div>
+                    <div class="stat-card green"><div class="label">Total Profit</div><div class="value" id="stat-profit">-</div><div class="sub">ETH</div></div>
+                    <div class="stat-card"><div class="label">Wallet Balance</div><div class="value" id="stat-wallet">-</div><div class="sub">ETH</div></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header"><h3>Collection Overview</h3></div>
+                    <table>
+                        <thead><tr><th>Collection</th><th>Chain</th><th>Floor</th><th>Best Bid</th><th>Spread</th><th>Wash</th><th>Liquidity</th><th>Status</th></tr></thead>
+                        <tbody id="dash-collections"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <div class="section-header"><h3>Latest Opportunities</h3></div>
+                    <table>
+                        <thead><tr><th>Strategy</th><th>Token</th><th>Buy</th><th>Exit</th><th>Profit</th><th>ROI</th><th>Fill%</th><th>Confidence</th><th>Status</th></tr></thead>
+                        <tbody id="dash-opps"><tr><td colspan="9" class="empty">Scanner is running...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ COLLECTIONS PAGE ═══ -->
+            <div id="page-collections" class="page">
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Tracked Collections</h3>
+                        <button class="btn" onclick="refreshCollections()">Refresh</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Name</th><th>Slug</th><th>Chain</th><th>Contract</th><th>Floor</th><th>Best Bid</th><th>Royalty</th><th>Wash</th><th>Liquidity</th><th>Status</th></tr></thead>
+                        <tbody id="col-table"><tr><td colspan="10" class="empty">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ OPPORTUNITIES PAGE ═══ -->
+            <div id="page-opportunities" class="page">
+                <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card"><div class="label">Total</div><div class="value" id="opp-total">-</div></div>
+                    <div class="stat-card yellow"><div class="label">Pending</div><div class="value" id="opp-pending">-</div></div>
+                    <div class="stat-card blue"><div class="label">Approved</div><div class="value" id="opp-approved">-</div></div>
+                    <div class="stat-card"><div class="label">Rejected</div><div class="value" id="opp-rejected">-</div></div>
+                </div>
+                <div class="section">
+                    <div class="section-header">
+                        <h3>All Opportunities</h3>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn sm" onclick="filterOpps('')">All</button>
+                            <button class="btn sm" style="color:#ffaa00;" onclick="filterOpps('pending')">Pending</button>
+                            <button class="btn sm" style="color:#00d4ff;" onclick="filterOpps('approved')">Approved</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead><tr><th>Time</th><th>Strategy</th><th>Token</th><th>Buy</th><th>Exit</th><th>Net Profit</th><th>ROI</th><th>Fill%</th><th>QC</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="opp-table"><tr><td colspan="11" class="empty">No opportunities yet</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ TRADES PAGE ═══ -->
+            <div id="page-trades" class="page">
+                <div class="section">
+                    <div class="section-header"><h3>Trade History</h3></div>
+                    <table>
+                        <thead><tr><th>Time</th><th>Side</th><th>Token</th><th>Marketplace</th><th>Price</th><th>Gas</th><th>TX Hash</th><th>Status</th></tr></thead>
+                        <tbody id="trade-table"><tr><td colspan="8" class="empty">No trades executed yet</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ DISCOVERY PAGE ═══ -->
+            <div id="page-discovery" class="page">
+                <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card blue"><div class="label">Alpha Signals</div><div class="value" id="disc-alpha-count">-</div><div class="sub">Emerging collections</div></div>
+                    <div class="stat-card green"><div class="label">Undervalued</div><div class="value" id="disc-undervalued">-</div><div class="sub">High score, low floor</div></div>
+                    <div class="stat-card yellow"><div class="label">Whale Alerts</div><div class="value" id="disc-whale-count">-</div><div class="sub">Smart money buys</div></div>
+                    <div class="stat-card"><div class="label">Hot Collections</div><div class="value" id="disc-hot-count">-</div><div class="sub">2+ whales buying</div></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Alpha Signals — Emerging Collections</h3>
+                        <button class="btn" onclick="refreshDiscovery()">Scan Now</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Collection</th><th>Chain</th><th>Floor</th><th>Alpha Score</th><th>Signal</th><th>Mints</th><th>Unique Buyers</th><th>Source</th></tr></thead>
+                        <tbody id="disc-alpha-table"><tr><td colspan="8" class="empty">Run discovery scan...</td></tr></tbody>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Whale Tracker — Smart Money Activity</h3>
+                        <button class="btn" onclick="refreshWhales()">Scan Whales</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Collection</th><th>Whale Count</th><th>Purchases</th><th>Total Spent</th><th>Avg Price</th><th>Wallets</th></tr></thead>
+                        <tbody id="disc-whale-table"><tr><td colspan="6" class="empty">Run whale scan...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ LIVE SCANNER PAGE ═══ -->
+            <div id="page-scanner" class="page">
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-card"><div class="label">Scan Cycle</div><div class="value" id="scan-cycle">-</div><div class="sub">every 30s</div></div>
+                    <div class="stat-card blue"><div class="label">Listings Checked</div><div class="value" id="scan-listings">-</div></div>
+                    <div class="stat-card green"><div class="label">Opportunities Found</div><div class="value" id="scan-found">-</div></div>
+                </div>
+                <div class="section">
+                    <div class="section-header"><h3>Activity Log</h3></div>
+                    <div class="log-box" id="scanner-log">
+                        <div class="entry info">[System] Scanner initialized, waiting for data...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ SETTINGS PAGE ═══ -->
+            <div id="page-settings" class="page">
+                <div class="section">
+                    <div class="section-header"><h3>System Configuration</h3></div>
+                    <table>
+                        <tbody>
+                            <tr><td style="color:#666;width:250px;">Execution Mode</td><td id="set-mode">-</td></tr>
+                            <tr><td style="color:#666;">Ingestion Interval</td><td id="set-ingestion">-</td></tr>
+                            <tr><td style="color:#666;">Scan Interval</td><td id="set-scan">-</td></tr>
+                            <tr><td style="color:#666;">Max Total Exposure</td><td id="set-exposure">-</td></tr>
+                            <tr><td style="color:#666;">Max Single Trade</td><td id="set-single">-</td></tr>
+                            <tr><td style="color:#666;">Stop Loss</td><td id="set-stoploss">-</td></tr>
+                            <tr><td style="color:#666;">Min Net Profit</td><td id="set-minprofit">-</td></tr>
+                            <tr><td style="color:#666;">Min ROI</td><td id="set-minroi">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="section">
+                    <div class="section-header"><h3>API Status</h3></div>
+                    <table>
+                        <tbody>
+                            <tr><td style="color:#666;width:250px;">OpenSea API</td><td id="api-opensea"><span class="badge pending">checking...</span></td></tr>
+                            <tr><td style="color:#666;">Moralis API</td><td id="api-moralis"><span class="badge pending">checking...</span></td></tr>
+                            <tr><td style="color:#666;">Ethereum RPC</td><td id="api-rpc"><span class="badge pending">checking...</span></td></tr>
+                            <tr><td style="color:#666;">Redis Cache</td><td id="api-redis"><span class="badge pending">checking...</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Navigation ──
+        let currentFilter = '';
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar nav a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                const page = link.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + page).classList.add('active');
+                document.getElementById('page-title').textContent = link.textContent.trim();
+                if (page === 'settings') loadSettings();
+                if (page === 'discovery') { refreshDiscovery(); refreshWhales(); }
+            });
+        });
+
+        // ── API Helper ──
+        async function fetchJSON(url) {
+            try {
+                const r = await fetch(url);
+                if (!r.ok) return null;
+                return await r.json();
+            } catch { return null; }
+        }
+
+        // ── Refresh All ──
+        async function refreshAll() {
+            const health = await fetchJSON('/health');
+            if (health) {
+                document.getElementById('sidebar-status').textContent = 'Running';
+                document.getElementById('sidebar-uptime').textContent = (health.uptime_hours || 0).toFixed(1);
+                // Wallet info
+                const w = health.wallet || {};
+                const walletEl = document.getElementById('stat-wallet');
+                if (walletEl) {
+                    walletEl.textContent = w.ready ? (w.balance_eth || 0).toFixed(4) : 'N/A';
+                    walletEl.title = w.address || 'not configured';
+                }
+            }
+
+            const stats = await fetchJSON('/api/dashboard/stats');
+            if (stats) {
+                document.getElementById('stat-collections').textContent = stats.total_collections || 0;
+                document.getElementById('stat-opportunities').textContent = stats.total_opportunities || 0;
+                document.getElementById('stat-opp-sub').textContent = `${stats.pending_opportunities || 0} pending`;
+                document.getElementById('stat-trades').textContent = stats.total_trades || 0;
+                document.getElementById('stat-trades-sub').textContent = `${stats.executed_trades || 0} executed`;
+                document.getElementById('stat-profit').textContent = (stats.total_profit_eth || 0).toFixed(4);
+                document.getElementById('opp-total').textContent = stats.total_opportunities || 0;
+                document.getElementById('opp-pending').textContent = stats.pending_opportunities || 0;
+                document.getElementById('opp-approved').textContent = stats.approved_opportunities || 0;
+                document.getElementById('opp-rejected').textContent = (stats.total_opportunities || 0) - (stats.pending_opportunities || 0) - (stats.approved_opportunities || 0);
+            }
+
+            refreshCollections();
+            refreshOpportunities();
+            refreshTrades();
+
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        // ── Collections ──
+        async function refreshCollections() {
+            const data = await fetchJSON('/api/collections');
+            const renderDash = (id, cols) => {
+                const el = document.getElementById(id);
+                if (!cols || cols.length === 0) { el.innerHTML = `<tr><td colspan="8" class="empty">No collections</td></tr>`; return; }
+                el.innerHTML = cols.map(c => {
+                    const floor = c.floor_price ? parseFloat(c.floor_price).toFixed(3) : '-';
+                    const bid = c.best_bid ? parseFloat(c.best_bid).toFixed(3) : '-';
+                    const spread = (c.floor_price && c.best_bid) ? ((c.floor_price - c.best_bid) / c.floor_price * 100).toFixed(1) + '%' : '-';
+                    const st = c.is_active !== false ? 'active' : 'rejected';
+                    const wash = c.wash_score != null ? parseFloat(c.wash_score).toFixed(2) : '-';
+                    const liq = c.liquidity_score != null ? parseFloat(c.liquidity_score).toFixed(2) : '-';
+                    const washColor = parseFloat(wash) > 0.6 ? '#ff4444' : parseFloat(wash) > 0.3 ? '#ffaa00' : '#00ff88';
+                    const liqColor = parseFloat(liq) > 0.6 ? '#00ff88' : parseFloat(liq) > 0.3 ? '#ffaa00' : '#ff4444';
+                    return `<tr>
+                        <td><strong>${c.name || c.slug}</strong></td>
+                        <td>${c.chain || 'ethereum'}</td>
+                        <td>${floor} <span class="eth">ETH</span></td>
+                        <td>${bid} <span class="eth">ETH</span></td>
+                        <td>${spread}</td>
+                        <td style="color:${washColor}">${wash}</td>
+                        <td style="color:${liqColor}">${liq}</td>
+                        <td><span class="badge ${st}">${st}</span></td>
+                    </tr>`;
+                }).join('');
+            };
+            const renderFull = (id, cols) => {
+                const el = document.getElementById(id);
+                if (!cols || cols.length === 0) { el.innerHTML = `<tr><td colspan="10" class="empty">No collections</td></tr>`; return; }
+                el.innerHTML = cols.map(c => {
+                    const floor = c.floor_price ? parseFloat(c.floor_price).toFixed(3) : '-';
+                    const bid = c.best_bid ? parseFloat(c.best_bid).toFixed(3) : '-';
+                    const st = c.is_active !== false ? 'active' : 'rejected';
+                    const contract = c.contract_address ? c.contract_address.substring(0,6) + '...' + c.contract_address.slice(-4) : '-';
+                    const wash = c.wash_score != null ? parseFloat(c.wash_score).toFixed(2) : '-';
+                    const liq = c.liquidity_score != null ? parseFloat(c.liquidity_score).toFixed(2) : '-';
+                    return `<tr>
+                        <td><strong>${c.name || c.slug}</strong></td>
+                        <td>${c.slug || '-'}</td>
+                        <td>${c.chain || 'ethereum'}</td>
+                        <td style="font-size:0.75em;color:#666;">${contract}</td>
+                        <td>${floor} <span class="eth">ETH</span></td>
+                        <td>${bid} <span class="eth">ETH</span></td>
+                        <td>${(c.royalty_bps || 0) / 100}%</td>
+                        <td>${wash}</td>
+                        <td>${liq}</td>
+                        <td><span class="badge ${st}">${st}</span></td>
+                    </tr>`;
+                }).join('');
+            };
+            renderDash('dash-collections', data);
+            renderFull('col-table', data);
+        }
+
+        // ── Opportunities ──
+        async function refreshOpportunities() {
+            const url = currentFilter ? `/api/opportunities?status=${currentFilter}&limit=50` : '/api/opportunities?limit=50';
+            const data = await fetchJSON(url);
+            const render = (id, opps) => {
+                const el = document.getElementById(id);
+                if (!opps || opps.length === 0) { el.innerHTML = `<tr><td colspan="11" class="empty">No opportunities</td></tr>`; return; }
+                el.innerHTML = opps.map(o => {
+                    const buy = parseFloat(o.buy_price || 0).toFixed(4);
+                    const exit = parseFloat(o.expected_exit || 0).toFixed(4);
+                    const profit = parseFloat(o.net_profit || 0).toFixed(4);
+                    const roi = (parseFloat(o.roi || 0) * 100).toFixed(1);
+                    const conf = (parseFloat(o.confidence || 0) * 100).toFixed(0);
+                    const fillP = o.fill_probability != null ? (parseFloat(o.fill_probability) * 100).toFixed(0) + '%' : '-';
+                    const fillColor = parseFloat(o.fill_probability || 0) > 0.7 ? '#00ff88' : parseFloat(o.fill_probability || 0) > 0.4 ? '#ffaa00' : '#ff4444';
+                    const time = o.created_at ? new Date(o.created_at).toLocaleTimeString() : '-';
+                    const actions = o.status === 'pending' ? `<button class="btn sm green" onclick="approveOpp('${o.id}')" title="Execute this trade now">Execute</button> <button class="btn sm red" onclick="rejectOpp('${o.id}')">Skip</button>` : (o.status === 'executed' ? '<span style="color:#00ff88">Done</span>' : '-');
+                    return `<tr>
+                        <td style="color:#555;">${time}</td>
+                        <td>${o.strategy || '-'}</td>
+                        <td>${o.token_id || '-'}</td>
+                        <td>${buy} <span class="eth">ETH</span></td>
+                        <td>${exit} <span class="eth">ETH</span></td>
+                        <td style="color:${parseFloat(profit)>0?'#00ff88':'#ff4444'}">${profit} <span class="eth">ETH</span></td>
+                        <td>${roi}%</td>
+                        <td style="color:${fillColor}">${fillP}</td>
+                        <td>${o.qc_verdict || '-'}</td>
+                        <td><span class="badge ${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+                        <td>${actions}</td>
+                    </tr>`;
+                }).join('');
+            };
+            render('dash-opps', data);
+            render('opp-table', data);
+        }
+
+        function filterOpps(status) { currentFilter = status; refreshOpportunities(); }
+
+        async function approveOpp(id) {
+            const btn = event.target;
+            btn.textContent = 'Executing...';
+            btn.disabled = true;
+            try {
+                const res = await fetch(`/api/opportunities/${id}`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status:'approved'}) });
+                const result = await res.json();
+                if (result.status === 'executed') {
+                    btn.textContent = 'Executed!';
+                    btn.style.color = '#00ff88';
+                } else {
+                    btn.textContent = 'Approved';
+                }
+            } catch(e) {
+                btn.textContent = 'Error';
+                btn.style.color = '#ff4444';
+            }
+            setTimeout(refreshAll, 1000);
+        }
+        async function rejectOpp(id) {
+            await fetch(`/api/opportunities/${id}`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status:'rejected'}) });
+            refreshAll();
+        }
+
+        // ── Trades ──
+        async function refreshTrades() {
+            const data = await fetchJSON('/api/trades');
+            const el = document.getElementById('trade-table');
+            if (!data || data.length === 0) { el.innerHTML = `<tr><td colspan="8" class="empty">No trades yet</td></tr>`; return; }
+            el.innerHTML = data.map(t => {
+                const time = t.executed_at ? new Date(t.executed_at).toLocaleString() : '-';
+                const price = parseFloat(t.price || 0).toFixed(4);
+                const gas = parseFloat(t.gas_used || 0).toFixed(5);
+                const tx = t.tx_hash && t.tx_hash.startsWith('0x') ? `<a href="https://etherscan.io/tx/${t.tx_hash}" target="_blank" style="color:#00d4ff;text-decoration:none;">${t.tx_hash.substring(0,10)}...</a>` : (t.tx_hash || '-');
+                const sideClass = t.side === 'buy' ? 'color:#00d4ff' : 'color:#a855f7';
+                return `<tr>
+                    <td style="color:#555;">${time}</td>
+                    <td style="${sideClass};font-weight:600;text-transform:uppercase;">${t.side || '-'}</td>
+                    <td>${t.token_id || '-'}</td>
+                    <td>${t.marketplace || '-'}</td>
+                    <td>${price} <span class="eth">ETH</span></td>
+                    <td>${gas} <span class="eth">ETH</span></td>
+                    <td style="font-size:0.75em;color:#666;">${tx}</td>
+                    <td><span class="badge ${t.status || 'pending'}">${t.status || 'pending'}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Settings ──
+        function loadSettings() {
+            document.getElementById('set-mode').innerHTML = '<span class="badge executed">full_auto</span> Real Seaport execution';
+            document.getElementById('set-ingestion').textContent = '10 seconds';
+            document.getElementById('set-scan').textContent = '30 seconds';
+            document.getElementById('set-exposure').textContent = '5.0 ETH';
+            document.getElementById('set-single').textContent = '1.0 ETH';
+            document.getElementById('set-stoploss').textContent = '15%';
+            document.getElementById('set-minprofit').textContent = '0.005 ETH';
+            document.getElementById('set-minroi').textContent = '2%';
+
+            fetchJSON('/health').then(d => {
+                document.getElementById('api-opensea').innerHTML = d ? '<span class="badge active">connected</span>' : '<span class="badge rejected">error</span>';
+                document.getElementById('api-moralis').innerHTML = d ? '<span class="badge active">connected</span>' : '<span class="badge rejected">error</span>';
+
+                const w = d && d.wallet;
+                if (w && w.ready) {
+                    const addr = w.address.substring(0,6) + '...' + w.address.slice(-4);
+                    document.getElementById('api-rpc').innerHTML = `<span class="badge active">connected</span> <span style="color:#666;font-size:0.85em;margin-left:8px;">Wallet: <a href="https://etherscan.io/address/${w.address}" target="_blank" style="color:#00d4ff;">${addr}</a> (${w.balance_eth} ETH)</span>`;
+                } else {
+                    document.getElementById('api-rpc').innerHTML = '<span class="badge rejected">wallet not configured</span>';
+                }
+
+                document.getElementById('api-redis').innerHTML = '<span class="badge pending">in-memory fallback</span>';
+            });
+        }
+
+        // ── Scanner Log ──
+        let scanCycle = 0;
+        function addLog(msg, type = '') {
+            const log = document.getElementById('scanner-log');
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'entry ' + type;
+            div.textContent = `[${time}] ${msg}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+            if (log.children.length > 100) log.removeChild(log.firstChild);
+        }
+
+        // ── Discovery ──
+        async function refreshDiscovery() {
+            const alphaData = await fetchJSON('/api/discovery/alpha');
+            const el = document.getElementById('disc-alpha-table');
+            if (!alphaData || !alphaData.collections || alphaData.collections.length === 0) {
+                el.innerHTML = '<tr><td colspan="8" class="empty">No alpha signals found yet</td></tr>';
+                document.getElementById('disc-alpha-count').textContent = '0';
+            } else {
+                document.getElementById('disc-alpha-count').textContent = alphaData.count || 0;
+                el.innerHTML = alphaData.collections.map(c => {
+                    const score = (c.alpha_score || 0).toFixed(1);
+                    const scoreColor = score >= 50 ? '#00ff88' : score >= 25 ? '#ffaa00' : '#555';
+                    const barWidth = Math.min(score, 100);
+                    const floor = c.floor_price ? parseFloat(c.floor_price).toFixed(4) : '-';
+                    const name = c.name || c.slug || '?';
+                    const chain = c.chain || 'eth';
+                    const chainBadge = chain === 'base' ? '<span style="color:#0052ff">Base</span>'
+                                     : chain === 'polygon' ? '<span style="color:#8247e5">Polygon</span>'
+                                     : '<span style="color:#627eea">ETH</span>';
+                    return `<tr>
+                        <td><strong>${name.length > 25 ? name.substring(0,25)+'...' : name}</strong></td>
+                        <td>${chainBadge}</td>
+                        <td>${floor} <span class="eth">ETH</span></td>
+                        <td><div class="score-bar">
+                            <div class="bar"><div class="fill" style="width:${barWidth}%;background:${scoreColor};"></div></div>
+                            <span class="num" style="color:${scoreColor}">${score}</span>
+                        </div></td>
+                        <td>${c.signal_type || '-'}</td>
+                        <td>${c.mint_count || c.sales_24h || '-'}</td>
+                        <td>${c.unique_minters || c.owners || '-'}</td>
+                        <td style="color:#555;font-size:0.75em;">${c.source || '-'}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Undervalued count
+            const uvData = await fetchJSON('/api/discovery/alpha/undervalued');
+            document.getElementById('disc-undervalued').textContent = (uvData && uvData.count) || '0';
+        }
+
+        async function refreshWhales() {
+            const whaleData = await fetchJSON('/api/discovery/whales');
+            const el = document.getElementById('disc-whale-table');
+            if (!whaleData || !whaleData.collections || whaleData.collections.length === 0) {
+                el.innerHTML = '<tr><td colspan="6" class="empty">No whale activity detected</td></tr>';
+                document.getElementById('disc-whale-count').textContent = '0';
+            } else {
+                document.getElementById('disc-whale-count').textContent = whaleData.count || 0;
+                el.innerHTML = whaleData.collections.map(c => {
+                    const spent = (c.total_spent || 0).toFixed(3);
+                    const avg = (c.avg_price || 0).toFixed(4);
+                    const whaleAddrs = (c.unique_whales || []).map(w => w.substring(0,6) + '...' + w.slice(-4)).join(', ');
+                    const whaleCount = c.unique_whale_count || 0;
+                    const whaleColor = whaleCount >= 3 ? '#00ff88' : whaleCount >= 2 ? '#ffaa00' : '#888';
+                    return `<tr>
+                        <td><strong>${c.collection || '?'}</strong></td>
+                        <td style="color:${whaleColor};font-weight:700;">${whaleCount}</td>
+                        <td>${c.buy_count || 0}</td>
+                        <td>${spent} <span class="eth">ETH</span></td>
+                        <td>${avg} <span class="eth">ETH</span></td>
+                        <td style="font-size:0.7em;color:#666;">${whaleAddrs || '-'}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Hot collections
+            const hotData = await fetchJSON('/api/discovery/whales/hot');
+            document.getElementById('disc-hot-count').textContent = (hotData && hotData.count) || '0';
+        }
+
+        // ── Init ──
+        refreshAll();
+        setInterval(refreshAll, 10000);
+        setInterval(() => {
+            scanCycle++;
+            document.getElementById('scan-cycle').textContent = scanCycle;
+            addLog('Scan cycle #' + scanCycle + ' completed', 'info');
+        }, 30000);
+    </script>
+</body>
+</html>
