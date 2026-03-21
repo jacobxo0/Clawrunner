@@ -41,6 +41,13 @@ chmod 700 "$REAL_HOME/.openclaw" 2>/dev/null || true
 chmod 600 "$REAL_HOME/.openclaw/openclaw.json" 2>/dev/null || true
 echo "[DEBUG] Config copied to $REAL_HOME/.openclaw/openclaw.json"
 
+# === TARGETED DEBUG ===
+echo "[DEBUG] openclaw npm version: $(npm list openclaw --depth=0 2>&1 | grep openclaw || echo 'not found')"
+echo "[DEBUG] Config telegram.botToken set: $(node -e "try{const c=require('$REAL_HOME/.openclaw/openclaw.json');const t=c.channels&&c.channels.telegram&&c.channels.telegram.botToken;console.log(t&&t.length>0?'YES (len='+t.length+')':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
+echo "[DEBUG] Config gateway.auth.token set: $(node -e "try{const c=require('$REAL_HOME/.openclaw/openclaw.json');const t=c.gateway&&c.gateway.auth&&c.gateway.auth.token;console.log(t&&t.length>0?'YES':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
+echo "[DEBUG] Config brave.apiKey set: $(node -e "try{const c=require('$REAL_HOME/.openclaw/openclaw.json');const t=c.tools&&c.tools.web&&c.tools.web.search&&c.tools.web.search.apiKey;console.log(t&&t.length>0?'YES':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
+# === END DEBUG ===
+
 # Vis doctor help for at se tilgængelige flag
 echo "[DEBUG] doctor help:"
 npx openclaw doctor --help 2>&1 || true
