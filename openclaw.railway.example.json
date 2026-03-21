@@ -24,6 +24,15 @@
       }
     }
   },
+  "models": {
+    "providers": {
+      "ollama": {
+        "api": "ollama",
+        "baseUrl": "${OLLAMA_BASE_URL}",
+        "models": ["llama3.2:latest"]
+      }
+    }
+  },
   "tools": {
     "web": {
       "search": {
