@@ -1,0 +1,6 @@
+{
+  "name": "hetzner-shell",
+  "description": "Run commands on Hetzner server via HTTP runner",
+  "version": "1.0.0",
+  "env": ["HETZNER_RUNNER_URL", "HETZNER_RUNNER_TOKEN"]
+}
