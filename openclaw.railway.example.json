@@ -16,7 +16,7 @@
       },
       "workspace": "./workspace",
       "compaction": {
-        "mode": "safeguard",
+        "mode": "rolling",
         "reserveTokensFloor": 4000
       },
       "maxConcurrent": 4,
