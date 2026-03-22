@@ -12,7 +12,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "groq/llama-3.3-70b-versatile"
+        "primary": "ollama/llama3.2"
       },
       "workspace": "./workspace",
       "compaction": {
