@@ -16,7 +16,8 @@
       },
       "workspace": "./workspace",
       "compaction": {
-        "mode": "safeguard"
+        "mode": "safeguard",
+        "reserveTokensFloor": 4000
       },
       "maxConcurrent": 4,
       "subagents": {
