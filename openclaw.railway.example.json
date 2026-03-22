@@ -53,8 +53,7 @@
           "requireMention": true
         }
       },
-      "groupPolicy": "allowlist",
-      "streamMode": "partial"
+      "groupPolicy": "allowlist"
     },
     "discord": {
       "enabled": false,
