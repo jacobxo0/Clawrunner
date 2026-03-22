@@ -52,7 +52,7 @@ fi
 # === CONFIG VERIFICATION (idempotent — altid fra $ROOT/openclaw.json) ===
 echo "[DEBUG] openclaw npm version: $(npm list openclaw --depth=0 2>&1 | grep openclaw || echo 'not found')"
 echo "[DEBUG] Config model.primary: $(node -e "try{const c=require('$ROOT/openclaw.json');console.log(c.agents&&c.agents.defaults&&c.agents.defaults.model&&c.agents.defaults.model.primary||'NOT SET')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
-echo "[DEBUG] Config groq.apiKey set: $(node -e "try{const c=require('$ROOT/openclaw.json');const k=c.models&&c.models.providers&&c.models.providers.groq&&c.models.providers.groq.apiKey;console.log(k&&k.length>0?'YES (len='+k.length+')':'EMPTY — 401 will occur')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
+echo "[DEBUG] GROQ_API_KEY env (LiteLLM auto-reads): $([ -n "${GROQ_API_KEY:-}" ] && echo 'set (len='${#GROQ_API_KEY}')' || echo 'NOT SET — 401 will occur at inference')"
 echo "[DEBUG] Config telegram.allowFrom: $(node -e "try{const c=require('$ROOT/openclaw.json');const a=c.channels&&c.channels.telegram&&c.channels.telegram.allowFrom;console.log(JSON.stringify(a))}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
 echo "[DEBUG] Config telegram.botToken set: $(node -e "try{const c=require('$ROOT/openclaw.json');const t=c.channels&&c.channels.telegram&&c.channels.telegram.botToken;console.log(t&&t.length>0?'YES (len='+t.length+')':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
 echo "[DEBUG] Config gateway.auth.token set: $(node -e "try{const c=require('$ROOT/openclaw.json');const t=c.gateway&&c.gateway.auth&&c.gateway.auth.token;console.log(t&&t.length>0?'YES':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
