@@ -32,6 +32,30 @@ if (cfg.channels && cfg.channels.telegram) {
   cfg.channels.telegram.allowFrom = arr;
 }
 
+// Remove Ollama provider if OLLAMA_BASE_URL is not set (empty baseUrl breaks schema)
+if (cfg.models && cfg.models.providers && cfg.models.providers.ollama) {
+  const ollamaBaseUrl = cfg.models.providers.ollama.baseUrl || '';
+  if (!ollamaBaseUrl) {
+    delete cfg.models.providers.ollama;
+    console.log('[build-config] Ollama provider removed (OLLAMA_BASE_URL not set).');
+  }
+}
+
+// Remove Groq provider if GROQ_API_KEY is not set
+if (cfg.models && cfg.models.providers && cfg.models.providers.groq) {
+  const groqApiKey = cfg.models.providers.groq.apiKey || '';
+  if (!groqApiKey) {
+    delete cfg.models.providers.groq;
+    console.log('[build-config] WARNING: Groq provider removed (GROQ_API_KEY not set) — 401 will occur!');
+  }
+}
+
+// Remove models section entirely if no providers remain
+if (cfg.models && cfg.models.providers && Object.keys(cfg.models.providers).length === 0) {
+  delete cfg.models;
+  console.log('[build-config] models.providers is empty — removed models section.');
+}
+
 fs.writeFileSync(dst, JSON.stringify(cfg, null, 2));
 
 // Debug output
@@ -39,3 +63,7 @@ const written = fs.readFileSync(dst, 'utf8');
 const ki = written.indexOf('"apiKey"');
 console.log('[build-config] apiKey snippet:', ki >= 0 ? written.substring(ki, ki + 30) : 'not found');
 console.log('[build-config] primary:', cfg.agents && cfg.agents.defaults && cfg.agents.defaults.model && cfg.agents.defaults.model.primary);
+const groqKey = cfg.models && cfg.models.providers && cfg.models.providers.groq && cfg.models.providers.groq.apiKey;
+console.log('[build-config] groq.apiKey set:', groqKey && groqKey.length > 0 ? 'YES (len=' + groqKey.length + ')' : 'NO — 401 will occur');
+const ollamaUrl = cfg.models && cfg.models.providers && cfg.models.providers.ollama && cfg.models.providers.ollama.baseUrl;
+console.log('[build-config] ollama.baseUrl set:', ollamaUrl && ollamaUrl.length > 0 ? 'YES' : 'NO (removed)');
