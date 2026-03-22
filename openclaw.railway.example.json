@@ -27,19 +27,10 @@
   "models": {
     "providers": {
       "groq": {
-        "api": "openai",
         "baseUrl": "https://api.groq.com/openai/v1",
         "apiKey": "${GROQ_API_KEY}",
         "models": [
-          {"id": "llama-3.3-70b-versatile"}
-        ]
-      },
-      "ollama": {
-        "api": "openai",
-        "baseUrl": "${OLLAMA_BASE_URL}",
-        "apiKey": "${OLLAMA_API_KEY}",
-        "models": [
-          {"id": "llama3.2:latest"}
+          {"name": "llama-3.3-70b-versatile"}
         ]
       }
     }

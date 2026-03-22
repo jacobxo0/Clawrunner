@@ -32,16 +32,7 @@ if (cfg.channels && cfg.channels.telegram) {
   cfg.channels.telegram.allowFrom = arr;
 }
 
-// Remove Ollama provider if OLLAMA_BASE_URL is not set (empty baseUrl breaks schema)
-if (cfg.models && cfg.models.providers && cfg.models.providers.ollama) {
-  const ollamaBaseUrl = cfg.models.providers.ollama.baseUrl || '';
-  if (!ollamaBaseUrl) {
-    delete cfg.models.providers.ollama;
-    console.log('[build-config] Ollama provider removed (OLLAMA_BASE_URL not set).');
-  }
-}
-
-// Remove Groq provider if GROQ_API_KEY is not set
+// Remove Groq provider if GROQ_API_KEY is not set (empty apiKey causes 401)
 if (cfg.models && cfg.models.providers && cfg.models.providers.groq) {
   const groqApiKey = cfg.models.providers.groq.apiKey || '';
   if (!groqApiKey) {
@@ -65,5 +56,4 @@ console.log('[build-config] apiKey snippet:', ki >= 0 ? written.substring(ki, ki
 console.log('[build-config] primary:', cfg.agents && cfg.agents.defaults && cfg.agents.defaults.model && cfg.agents.defaults.model.primary);
 const groqKey = cfg.models && cfg.models.providers && cfg.models.providers.groq && cfg.models.providers.groq.apiKey;
 console.log('[build-config] groq.apiKey set:', groqKey && groqKey.length > 0 ? 'YES (len=' + groqKey.length + ')' : 'NO — 401 will occur');
-const ollamaUrl = cfg.models && cfg.models.providers && cfg.models.providers.ollama && cfg.models.providers.ollama.baseUrl;
-console.log('[build-config] ollama.baseUrl set:', ollamaUrl && ollamaUrl.length > 0 ? 'YES' : 'NO (removed)');
+console.log('[build-config] providers present:', cfg.models && cfg.models.providers ? Object.keys(cfg.models.providers).join(', ') : 'none');
