@@ -6,5 +6,7 @@ node_modules
 .openclaw
 # Lokal config med secrets – Railway bruger template + env
 openclaw.json
-# Projekt-kode er lokal udvikling — skal ikke deployes til Railway (sprænger kontekstvindue)
+# Projekt-kode og tunge workspace-filer deployes ikke — sprænger Groq TPM-limit
 workspace/projects
+workspace/skills
+workspace/notes
