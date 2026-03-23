@@ -32,7 +32,8 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "ollama/llama3.2:latest"
+        "primary": "ollama/llama3.2:latest",
+        "fallbacks": ["groq/llama-3.3-70b-versatile"]
       },
       "workspace": "./workspace",
       "compaction": {
