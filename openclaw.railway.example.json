@@ -22,7 +22,7 @@
             "reasoning": false,
             "input": ["text"],
             "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
-            "contextWindow": 8192,
+            "contextWindow": 16384,
             "maxTokens": 4096
           }
         ]
@@ -32,8 +32,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "ollama/llama3.2:latest",
-        "fallbacks": ["groq/llama-3.3-70b-versatile"]
+        "primary": "ollama/llama3.2:latest"
       },
       "workspace": "./workspace",
       "compaction": {
