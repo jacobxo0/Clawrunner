@@ -4,3 +4,5 @@
 
 [deploy]
 startCommand = "bash scripts/railway-start.sh"
+healthcheckPath = "/"
+healthcheckTimeout = 30

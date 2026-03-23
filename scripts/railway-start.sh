@@ -80,6 +80,12 @@ DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
+# Send Telegram notifikation når gateway starter
+(sleep 15 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+  --data-urlencode "chat_id=8572521981" \
+  --data-urlencode "text=✅ Clawrunner er online og klar. Model: groq/llama-3.1-8b-instant" \
+  > /dev/null) &
+
 # Kør gateway
 echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
 set +e
