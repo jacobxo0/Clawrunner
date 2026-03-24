@@ -80,16 +80,38 @@ DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
-# Send Telegram notifikation når gateway starter
+# Watchdog: genstarter gatewayen automatisk ved exit (polling-drop, OOM, etc.)
+RESTART_COUNT=0
+MAX_RESTARTS=20
+
+run_gateway() {
+  echo "[DEBUG] Starting OpenClaw gateway on port $PORT (attempt $((RESTART_COUNT+1)))..."
+  set +e
+  npx openclaw gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
+  EXIT=$?
+  set -e
+  echo "[EXIT] Gateway exited with code $EXIT"
+}
+
+# Send Telegram notifikation første gang gateway starter
 (sleep 15 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
   --data-urlencode "chat_id=8572521981" \
   --data-urlencode "text=✅ Clawrunner er online og klar. Model: groq/llama-3.3-70b-versatile" \
   > /dev/null) &
 
-# Kør gateway
-echo "[DEBUG] Starting OpenClaw gateway on port $PORT ..."
-set +e
-npx openclaw gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
-EXIT=$?
-echo "[EXIT] Gateway exited with code $EXIT"
-exit $EXIT
+while [ $RESTART_COUNT -lt $MAX_RESTARTS ]; do
+  run_gateway
+  RESTART_COUNT=$((RESTART_COUNT+1))
+  if [ $RESTART_COUNT -lt $MAX_RESTARTS ]; then
+    echo "[WATCHDOG] Gateway stoppede. Genstarter om 5s... (forsøg $RESTART_COUNT/$MAX_RESTARTS)"
+    # Send Telegram notifikation ved genstart
+    curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+      --data-urlencode "chat_id=8572521981" \
+      --data-urlencode "text=⚠️ Clawrunner genstartet (forsøg $RESTART_COUNT/$MAX_RESTARTS)" \
+      > /dev/null || true
+    sleep 5
+  fi
+done
+
+echo "[WATCHDOG] Max genstarter nået ($MAX_RESTARTS). Afslutter."
+exit 1
