@@ -154,8 +154,24 @@ En Telegram bot med long-polling har specifikke krav der adskiller sig fra stand
 - $5 kredit er ~500 compute-timer på en 512MB instans — nok, men pas på memory-spike
 - Ingen cron-job på Hobby (skal håndteres eksternt)
 - Ingen SSH-adgang til debugging
+- **Bekræftet bug (juli 2025+):** Services kan sove selv med Serverless eksplicit disabled. Railway Help Station har uløste tråde om dette. Workaround: sørg for periodisk outbound HTTP-kald fra processen.
 
 **Konklusion Railway:** Acceptabelt til webhook-baseret bot. Problematisk til polling-bot.
+
+### Fly.io — anbefalet upgrade-sti
+
+Fly.io er det anbefalede næste trin hvis Railway giver for mange problemer:
+- Statiske IP-adresser inkluderet på alle planer
+- Ingen sleep/cold start (maskiner kører persistent)
+- Bedre SIGTERM/SIGINT håndtering ved zero-downtime deploys
+- 35+ globale regioner
+- Pris: ~$2-5/md for en lille always-on bot
+
+```
+Prototype → Railway (nemt, hurtigt setup)
+Production → Fly.io (bedre guarantees, statisk IP)
+Self-hosted → Hetzner (fuld kontrol, Ollama co-location)
+```
 
 ### Anbefalingen: Flyt til Hetzner eller brug webhook på Railway
 
@@ -301,8 +317,20 @@ Ingen konflikt. Ingen 409. Ingen backoff-loop.
 
 **Styrker:**
 - Ekstremt hurtig inference (typisk < 500ms first token)
-- Generøs gratis tier (op til 14.400 requests/dag, 131.072 tokens/minut)
-- God reasoning-kapacitet generelt
+- Lav latens gør det bedst til realtids Telegram-chat
+- Gratis tier tilgængelig permanent (ikke kun trial)
+
+**Præcise Groq rate limits (verificeret februar 2026):**
+
+| Model | RPM | TPM | Requests/dag | Tokens/dag |
+|-------|-----|-----|-------------|-----------|
+| **llama-3.3-70b-versatile** | 30 | 6.000 | 1.000 | 500.000 |
+| llama-3.1-8b-instant | 30 | 20.000 | 14.400 | ~500.000 |
+| llama-3.2-3b-preview | 30 | 7.000 | 7.000 | — |
+| gemma2-9b-it | 30 | 15.000 | 14.400 | — |
+| mixtral-8x7b | 30 | 5.000 | 14.400 | — |
+
+> **Vigtigt:** 30 RPM er per API-key, ikke per bruger. Ved en gruppekonversation med 5 aktive brugere er limit nået på sekunder.
 
 **Svagheder (kritiske for dette use case):**
 
@@ -310,8 +338,8 @@ Ingen konflikt. Ingen 409. Ingen backoff-loop.
 |---------|---------|--------|
 | Ustabil function calling | Genererer ikke konsistent valid JSON til tool-use | ❌ Kritisk — AI agent kan ikke kalde tools |
 | Temperatur-sensitivitet | Lav temperatur hjælper men eliminerer ikke problemet | Workaround, ikke fix |
-| Rate limits på 70B | 6.000 requests/dag på det store model | Kan nås ved aktiv brug |
-| Kontekstvindue | 128k tokens — godt, men chunking nødvendig for lange sessioner | Lavt impact |
+| Rate limits på 70B | Kun 1.000 requests/dag (ikke 14.400!) på 70B-model | ⚠️ Nås ved moderat brug |
+| Model deprecations | Groq deprecater versioner løbende uden varsel | Pin aldrig til specifik version-ID |
 
 **Groq function calling: hvad sker der præcist?**
 
@@ -388,6 +416,25 @@ Bruger sender besked
 - Anthropic claude-haiku: Structured output, tool-use, JSON generation
 - Ollama qwen2.5:7b: Offline fallback, privacy-sensitive requests, rate limit overflow
 
+### Alternative LLM-providers (research-verificerede, 2026)
+
+| Provider | Gratis tier | Rate limits | Bedst til |
+|----------|------------|-------------|-----------|
+| **Groq** | Ja, permanent | 30 RPM, 6K TPM (70B) | Lav-latens single-user bots |
+| **Mistral API** | Ja, permanent | 1 mia. tokens/måned | Høj-volumen bots |
+| **Google Gemini Flash** | Ja, permanent | 15 RPM (gratis) | Lange kontekster (1M tokens) |
+| **OpenRouter** | Ja, 50 req/dag | Varierer per model | Model-eksperimenter, fallback routing |
+| **Cerebras** | Begrænset beta | — | Speed-kritisk (Groq-lignende latens) |
+| **Together AI** | Kun signup-kredit | N/A (udløber) | Test kun, ikke produktion |
+| **Ollama (self-hosted)** | Gratis for evigt | Hardware-begrænset | Privacy, ingen rate limits |
+
+**Anbefalet multi-provider strategi:**
+```
+Primary:   Groq (llama-3.1-8b-instant til tool-use, 3.3-70b til chat)
+Fallback:  Mistral API (1B tokens/måned, anden provider = resilience)
+Escape:    Ollama qwen2.5:7b på Hetzner (nul rate limits)
+```
+
 ### Er Hetzner 8GB nok til Ollama + OpenClaw?
 
 **Nuværende setup (Railway + Hetzner separat):** Ja, 8GB er rigeligt til kun Ollama.
@@ -405,12 +452,14 @@ Bruger sender besked
 ```
 Type:     CX32 (shared vCPU)
 RAM:      8 GB
-vCPU:     4 (shared)
-Disk:     80 GB SSD
+vCPU:     4 (AMD EPYC, shared)
+Disk:     80 GB NVMe SSD
 Location: Nuremberg (nbg1)
 OS:       Ubuntu 22.04/24.04
-Pris:     ~€9.49/måned
+Pris:     €6.80/måned (€0.011/time)  ← verificeret marts 2026
 ```
+
+> Hetzner annoncerede prisregulering pr. 1. april 2026 — tjek aktuel pris på hetzner.com/cloud
 
 ### "Shared vCPU" — hvad betyder det?
 
@@ -461,15 +510,28 @@ Buffer:           ~850 MB
 Total:            ~7.0 GB  ⚠️ Meget snævert
 ```
 
-### Serversammenligning: CX32 vs CX42
+### CPU inference-hastighed (Hetzner, CPU-only, ingen GPU)
 
-| Spec | CX32 (nuværende) | CX42 | CX52 |
-|------|-----------------|------|------|
-| RAM | 8 GB | 16 GB | 32 GB |
-| vCPU | 4 shared | 8 shared | 16 shared |
-| Disk | 80 GB | 160 GB | 240 GB |
-| Pris | ~€9.49/md | ~€19.49/md | ~€38.49/md |
-| Ollama model maks | qwen2.5:7b | qwen2.5:14b eller llama3.1:8b+tools | llama3.1:70b (Q4) |
+| Model | Quantization | Tokens/sek (4 vCPU) | 100-token svar | Telegram UX |
+|-------|-------------|---------------------|----------------|-------------|
+| llama3.2:1b | Q4 | ~20-25 t/s | ~4-5s | Fremragende |
+| llama3.2:3b | Q4_K_M | ~10-15 t/s | ~7-10s | God |
+| llama3:8b / qwen2.5:7b | Q4 | ~4-6 t/s | ~17-25s | Acceptabel* |
+
+> *Send `sendChatAction: typing` mens modellen genererer — forbedrer oplevet hastighed markant.
+
+### Serversammenligning: CX22 vs CX32 vs CX42
+
+| Spec | CX22 | CX32 (nuværende) | CX42 |
+|------|------|-----------------|------|
+| RAM | 4 GB | 8 GB | 16 GB |
+| vCPU | 2 shared | 4 shared | 8 shared |
+| Disk | 40 GB | 80 GB NVMe | 160 GB NVMe |
+| Pris | €3.79/md | **€6.80/md** | €14.07/md |
+| Ollama model maks | llama3.2:3b | **qwen2.5:7b** | qwen2.5:14b |
+| OpenClaw co-location | ❌ For lidt RAM | ✅ Muligt (snævert) | ✅ Komfortabelt |
+
+> CX22 er utilstrækkelig til Ollama + 3B+ model + OS. CX32 er minimum viable.
 
 **Anbefaling:**
 
@@ -914,4 +976,38 @@ railway logs -f
 
 ---
 
+## Appendiks C: Verificerede kilder (research-agent, 2026-03-28)
+
+**Telegram 409 & polling:**
+- node-telegram-bot-api Issue #550 — getUpdates ETELEGRAM 409 Conflict
+- grammY Docs — Long Polling vs. Webhooks (grammy.dev/guide/deployment-types)
+- GramIO Docs — Polling vs Webhook
+- DEV Community — NestJS Telegram bot fix 409 Conflict
+
+**Railway platform:**
+- Railway Docs — Restart Policy (docs.railway.com/deployments/restart-policy)
+- Railway Docs — App Sleeping / Serverless (docs.railway.com/reference/app-sleeping)
+- Railway Help Station — "Service sleeping even when serverless is disabled" (bekræftet bug)
+- Railway Template — Telegram Webhook Gateway (railway.com/deploy/telegram-webhook-gateway)
+
+**Platform-sammenligning:**
+- Medium — Railway vs Fly.io vs Render ROI
+- Northflank — Railway vs Render 2026
+- Kuberns — Deploy Telegram Bot 2026
+
+**Groq rate limits:**
+- Groq Console Docs — Rate Limits (console.groq.com/docs/rate-limits)
+- Groq Blog — Developer Tier
+- Zilgist — Groq Free Tier Rate Limits 2026
+- cheahjs/free-llm-api-resources (GitHub)
+
+**Hetzner & Ollama:**
+- Hetzner Community — AI Chatbot with Ollama and Open WebUI
+- LocalLLM.in — Ollama VRAM Requirements 2026
+- VPSBenchmarks — CX22 og CX32 benchmarks
+- LowEndTalk — Minimum spec for Ollama with Llama 3.2 3B
+
+---
+
 *Rapport udarbejdet: 2026-03-28 · OpenClaw 2026.3.22 · Railway Hobby · Hetzner CX32*
+*Research verificeret via live web-søgning samme dato*
