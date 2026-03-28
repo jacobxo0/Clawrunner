@@ -13,7 +13,7 @@
     "providers": {
       "groq": {
         "apiKey": "${GROQ_API_KEY}",
-        "api": "openai",
+        "api": "openai-completions",
         "baseUrl": "https://api.groq.com/openai/v1",
         "models": [
           {
