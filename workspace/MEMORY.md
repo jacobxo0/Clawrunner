@@ -6,6 +6,9 @@ Kun læses i main session (direkte chat med Jacob). Opdateres med beslutninger, 
 
 ## Beslutninger
 
+- **Byggesagsassistenten:** Jacobs primære SaaS-produkt under aktiv udvikling. AI-drevet desktop-platform til byggesagsbeskrivelser i dansk byggeri. Forankret i AB18/ABT18/BR18. Ignis hjælper med markedsføring og go-to-market — IKKE med selve produktkoden. Se `BYGGESAGSASSISTENTEN.md`.
+- **Primær model:** Skiftet til `ollama/qwen2.5:7b` (Hetzner) for bedre tool-call stabilitet.
+
 - **Clawrunner på Railway:** Gateway kører på `https://clawrunner-production.up.railway.app`; Telegram, cron og OpenClaw CLI peger her. UI (Clawrunner Control Center) er frontend til denne instans.
 - **Eget AI-ops system:** Bygge et helt eget system med fokus på sikkerhed, kontrol, modulær runtime og eget UI (ikke afhængigt af Claw).
 - **Custom Claw projekt:** Cloud-core, desktop, light/mobile med shared-state, multi-agent koordination og UI/Telegram kontrol.
