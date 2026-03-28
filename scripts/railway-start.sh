@@ -80,11 +80,18 @@ DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
-# Ryd evt. webhook-state fra Telegram inden polling starter (forhindrer 409 ved redeploy)
-echo "[DEBUG] Clearing any stale Telegram webhook..."
-curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=false" \
+# Ryd evt. webhook og polling-konflikt fra Telegram inden gateway starter.
+# deleteWebhook fjerner webhook-mode. Efterfølgende getUpdates med timeout=0 tvinger
+# eventuelle gamle polling-sessioner (409-konflikt) til at stoppe.
+echo "[DEBUG] Clearing any stale Telegram webhook + forcing polling reset..."
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true" \
   > /dev/null || true
-echo "[DEBUG] deleteWebhook done"
+# Kald getUpdates én gang for at tvinge gamle sessioner ud (forhindrer 409)
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=1&timeout=0&offset=-1" \
+  > /dev/null || true
+# Vent lidt så Telegram når at registrere reset
+sleep 3
+echo "[DEBUG] Telegram polling reset done"
 
 # Watchdog: genstarter gatewayen automatisk ved exit (polling-drop, OOM, etc.)
 RESTART_COUNT=0

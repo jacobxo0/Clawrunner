@@ -11,6 +11,22 @@
   },
   "models": {
     "providers": {
+      "groq": {
+        "apiKey": "${GROQ_API_KEY}",
+        "api": "openai",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "models": [
+          {
+            "id": "llama-3.3-70b-versatile",
+            "name": "Llama 3.3 70B Versatile",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0.59, "output": 0.79, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 128000,
+            "maxTokens": 32768
+          }
+        ]
+      },
       "ollama": {
         "apiKey": "${OLLAMA_API_KEY}",
         "baseUrl": "${OLLAMA_BASE_URL}",
@@ -32,7 +48,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "ollama/qwen2.5:7b"
+        "primary": "groq/llama-3.3-70b-versatile"
       },
       "workspace": "./workspace",
       "compaction": {
@@ -90,7 +106,7 @@
   "gateway": {
     "port": 18789,
     "mode": "local",
-    "bind": "auto",
+    "bind": "all",
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_TOKEN}"
