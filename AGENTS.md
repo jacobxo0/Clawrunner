@@ -29,10 +29,24 @@ Optional: `BRAVE_API_KEY`, `OLLAMA_API_KEY`, `OLLAMA_BASE_URL`, `TELEGRAM_GROUP_
 
 The Telegram `dmPolicy: "allowlist"` requires `allowFrom` to contain at least one sender ID. When building config with `build-config.js`, set `TELEGRAM_GROUP_ALLOW_FROM` to a JSON array with at least one ID (e.g. `'["12345"]'`), otherwise `openclaw gateway run` will refuse to start with a config validation error.
 
+### Ollama config gotcha
+
+The Ollama provider in `openclaw.railway.example.json` uses `${OLLAMA_BASE_URL}`. If this env var is unset, it resolves to an empty string and OpenClaw rejects the config (`models.providers.ollama.baseUrl: Too small`). Always set `OLLAMA_BASE_URL` to a placeholder (e.g. `http://localhost:11434`) even if Ollama isn't available.
+
+### Connecting to the Control UI
+
+The gateway serves a web dashboard at `http://127.0.0.1:18789/`. To authenticate, use the tokenized URL from `npx openclaw dashboard --no-open` (outputs a URL with `#token=...`). Alternatively, paste the `OPENCLAW_GATEWAY_TOKEN` value into the Gateway Token field manually.
+
+### Telegram 409 conflict
+
+If another bot instance is running elsewhere (e.g. on Railway) with the same `TELEGRAM_BOT_TOKEN`, you'll see `getUpdates conflict (409)` errors. The gateway retries automatically; this does not prevent the gateway from functioning otherwise.
+
 ### Useful commands
 
 - `npx openclaw --version` — check installed version
 - `npx openclaw doctor` — run config/state diagnostics
+- `npx openclaw dashboard --no-open` — get tokenized dashboard URL
+- `npx openclaw gateway stop` — stop a running gateway
 - `curl http://127.0.0.1:18789/healthz` — health check (gateway must be running)
 - `node scripts/build-config.js /workspace` — rebuild config from template + env vars
 
