@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="${OPENCLAW_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 cd "$ROOT"
 
+# Brug lokal binary direkte — npx kan ikke genfindes ved OpenClaw's interne respawn i Railway
+OPENCLAW="$ROOT/node_modules/.bin/openclaw"
+
 echo "[DEBUG] ROOT=$ROOT PWD=$(pwd)"
 
 # Port fra Railway (påkrævet)
@@ -80,7 +83,7 @@ sleep 2
 echo "[DEBUG] Telegram reset done — klar til polling"
 
 # Verificer openclaw CLI er tilgængeligt
-npx openclaw --version 2>&1 || { echo "[FATAL] openclaw CLI ikke fundet"; exit 1; }
+"$OPENCLAW" --version 2>&1 || { echo "[FATAL] openclaw CLI ikke fundet"; exit 1; }
 
 # Send Telegram-notifikation om opstart (baggrundsprocess, fejler stilet)
 (sleep 20 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
@@ -95,7 +98,7 @@ MAX_RESTARTS=20
 run_gateway() {
   echo "[DEBUG] Starter OpenClaw gateway på port $PORT (forsøg $((RESTART_COUNT+1)))..."
   set +e
-  npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
+  "$OPENCLAW" gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
   EXIT=$?
   set -e
   echo "[EXIT] Gateway stoppede med kode $EXIT"

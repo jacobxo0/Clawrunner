@@ -4,7 +4,7 @@
   "private": true,
   "description": "OpenClaw gateway deploy (Railway/VPS)",
   "scripts": {
-    "start": "openclaw gateway --port ${PORT:-18789}"
+    "start": "./node_modules/.bin/openclaw gateway run --port ${PORT:-18789}"
   },
   "engines": {
     "node": ">=22"
