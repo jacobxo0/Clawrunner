@@ -11,20 +11,34 @@
   },
   "models": {
     "providers": {
+      "anthropic": {
+        "apiKey": "${ANTHROPIC_API_KEY}",
+        "models": [
+          {
+            "id": "claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0.80, "output": 4.00, "cacheRead": 0.08, "cacheWrite": 1.00 },
+            "contextWindow": 200000,
+            "maxTokens": 8096
+          },
+          {
+            "id": "claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 3.00, "output": 15.00, "cacheRead": 0.30, "cacheWrite": 3.75 },
+            "contextWindow": 200000,
+            "maxTokens": 8096
+          }
+        ]
+      },
       "groq": {
         "apiKey": "${GROQ_API_KEY}",
         "api": "openai-completions",
         "baseUrl": "https://api.groq.com/openai/v1",
         "models": [
-          {
-            "id": "llama-3.3-70b-versatile",
-            "name": "Llama 3.3 70B Versatile",
-            "reasoning": false,
-            "input": ["text"],
-            "cost": { "input": 0.59, "output": 0.79, "cacheRead": 0, "cacheWrite": 0 },
-            "contextWindow": 128000,
-            "maxTokens": 32768
-          },
           {
             "id": "llama-3.1-8b-instant",
             "name": "Llama 3.1 8B Instant",
@@ -41,7 +55,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "groq/llama-3.3-70b-versatile"
+        "primary": "anthropic/claude-haiku-4-5-20251001"
       },
       "workspace": "/app/workspace",
       "compaction": {
@@ -49,7 +63,10 @@
       },
       "maxConcurrent": 4,
       "subagents": {
-        "maxConcurrent": 8
+        "maxConcurrent": 8,
+        "model": {
+          "primary": "groq/llama-3.1-8b-instant"
+        }
       }
     }
   },
@@ -66,8 +83,8 @@
     "ackReactionScope": "group-mentions"
   },
   "commands": {
-    "native": "off",
-    "nativeSkills": "off"
+    "native": "auto",
+    "nativeSkills": "auto"
   },
   "channels": {
     "telegram": {

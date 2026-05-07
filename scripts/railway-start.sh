@@ -14,6 +14,7 @@ export OPENCLAW_GATEWAY_PORT="$PORT"
 echo "[DEBUG] PORT=$PORT"
 
 [ -n "${OPENCLAW_GATEWAY_TOKEN}" ] || { echo "[FATAL] OPENCLAW_GATEWAY_TOKEN ikke sat."; exit 1; }
+[ -n "${ANTHROPIC_API_KEY}" ] || { echo "[FATAL] ANTHROPIC_API_KEY ikke sat."; exit 1; }
 
 export TELEGRAM_GROUP_ALLOW_FROM="${TELEGRAM_GROUP_ALLOW_FROM:-[]}"
 
@@ -39,6 +40,7 @@ if [ -d "$STATE_DIR" ]; then
   cp "$ROOT/openclaw.json" "$STATE_DIR/openclaw.json"
 fi
 
+echo "[DEBUG] ANTHROPIC_API_KEY: $([ -n "${ANTHROPIC_API_KEY:-}" ] && echo 'sat' || echo 'IKKE SAT')"
 echo "[DEBUG] GROQ_API_KEY: $([ -n "${GROQ_API_KEY:-}" ] && echo 'sat' || echo 'IKKE SAT')"
 echo "[DEBUG] TELEGRAM_BOT_TOKEN: $([ -n "${TELEGRAM_BOT_TOKEN:-}" ] && echo 'sat' || echo 'IKKE SAT')"
 
