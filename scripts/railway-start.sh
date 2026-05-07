@@ -35,6 +35,10 @@ chmod 700 "$REAL_HOME/.openclaw" 2>/dev/null || true
 chmod 600 "$REAL_HOME/.openclaw/openclaw.json" 2>/dev/null || true
 echo "[DEBUG] Config kopieret til $REAL_HOME/.openclaw/openclaw.json"
 
+# Ryd stale PID-fil — forhindrer "already running" fejl ved crash-genstart
+rm -f "$REAL_HOME/.openclaw/gateway.pid" 2>/dev/null || true
+echo "[DEBUG] Stale PID-fil ryddet"
+
 STATE_DIR="${OPENCLAW_STATE_DIR:-/data/.openclaw}"
 if [ -d "$STATE_DIR" ]; then
   cp "$ROOT/openclaw.json" "$STATE_DIR/openclaw.json"
