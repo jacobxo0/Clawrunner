@@ -46,3 +46,4 @@ console.log('[build-config] telegram.allowFrom:', JSON.stringify(cfg.channels &&
 console.log('[build-config] telegram.botToken sat:', cfg.channels && cfg.channels.telegram && cfg.channels.telegram.botToken ? 'JA' : 'NEJ — TELEGRAM VIRKER IKKE');
 console.log('[build-config] model.primary:', cfg.agents && cfg.agents.defaults && cfg.agents.defaults.model && cfg.agents.defaults.model.primary);
 console.log('[build-config] GROQ_API_KEY env:', process.env.GROQ_API_KEY ? 'sat (len=' + process.env.GROQ_API_KEY.length + ')' : 'IKKE SAT — 401 ved inference');
+console.log('[build-config] ANTHROPIC_API_KEY env:', process.env.ANTHROPIC_API_KEY ? 'sat (len=' + process.env.ANTHROPIC_API_KEY.length + ')' : 'IKKE SAT — model vil fejle');

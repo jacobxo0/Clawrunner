@@ -63,10 +63,7 @@
       },
       "maxConcurrent": 4,
       "subagents": {
-        "maxConcurrent": 8,
-        "model": {
-          "primary": "groq/llama-3.1-8b-instant"
-        }
+        "maxConcurrent": 8
       }
     }
   },
