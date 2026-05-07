@@ -7,7 +7,7 @@
     "providers": {
       "anthropic": {
         "apiKey": "${ANTHROPIC_API_KEY}",
-        "api": "anthropic",
+        "api": "anthropic-messages",
         "baseUrl": "https://api.anthropic.com",
         "models": [
           {
