@@ -62,12 +62,12 @@
             "maxTokens": 8192
           },
           {
-            "id": "compound-beta",
-            "name": "Groq Compound Beta",
+            "id": "mixtral-8x7b-32768",
+            "name": "Mixtral 8x7B",
             "reasoning": false,
             "input": ["text"],
-            "cost": { "input": 0.0, "output": 0.0, "cacheRead": 0, "cacheWrite": 0 },
-            "contextWindow": 128000,
+            "cost": { "input": 0.24, "output": 0.24, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 32768,
             "maxTokens": 32768
           }
         ]
