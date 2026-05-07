@@ -118,7 +118,8 @@
       "token": "${OPENCLAW_GATEWAY_TOKEN}"
     },
     "controlUi": {
-      "allowedOrigins": ["https://clawrunner-production.up.railway.app"]
+      "allowedOrigins": ["https://clawrunner-production.up.railway.app"],
+      "dangerouslyDisableDeviceAuth": true
     },
     "trustedProxies": ["100.64.0.0/10"],
     "tailscale": {
