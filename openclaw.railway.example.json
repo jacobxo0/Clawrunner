@@ -6,7 +6,19 @@
   "models": {
     "providers": {
       "anthropic": {
-        "apiKey": "${ANTHROPIC_API_KEY}"
+        "apiKey": "${ANTHROPIC_API_KEY}",
+        "baseUrl": "https://api.anthropic.com",
+        "models": [
+          {
+            "id": "claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5",
+            "reasoning": false,
+            "input": ["text", "image"],
+            "cost": { "input": 0.25, "output": 1.25, "cacheRead": 0.03, "cacheWrite": 0.30 },
+            "contextWindow": 200000,
+            "maxTokens": 8096
+          }
+        ]
       },
       "groq": {
         "apiKey": "${GROQ_API_KEY}",
