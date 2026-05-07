@@ -16,7 +16,8 @@
       "maxConcurrent": 4,
       "subagents": {
         "maxConcurrent": 8
-      }
+      },
+      "systemPrompt": "Du er Clawrunner, en hjælpsom AI-assistent tilgængelig via Telegram. Svar altid direkte og kortfattet på dansk. Brug ikke sub-agents til simple spørgsmål — svar selv med det samme."
     }
   },
   "tools": {
