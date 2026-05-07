@@ -3,56 +3,11 @@
     "lastTouchedVersion": "2026.5.6",
     "lastTouchedAt": "2026-05-07T00:00:00.000Z"
   },
-  "models": {
-    "providers": {
-      "anthropic": {
-        "apiKey": "${ANTHROPIC_API_KEY}",
-        "api": "anthropic-messages",
-        "baseUrl": "https://api.anthropic.com",
-        "models": [
-          {
-            "id": "claude-haiku-4-5-20251001",
-            "name": "Claude Haiku 4.5",
-            "reasoning": false,
-            "input": ["text", "image"],
-            "cost": { "input": 0.25, "output": 1.25, "cacheRead": 0.03, "cacheWrite": 0.30 },
-            "contextWindow": 200000,
-            "maxTokens": 8096
-          }
-        ]
-      },
-      "groq": {
-        "apiKey": "${GROQ_API_KEY}",
-        "api": "openai-completions",
-        "baseUrl": "https://api.groq.com/openai/v1",
-        "models": [
-          {
-            "id": "llama-3.3-70b-versatile",
-            "name": "Llama 3.3 70B Versatile",
-            "reasoning": false,
-            "input": ["text"],
-            "cost": { "input": 0.59, "output": 0.79, "cacheRead": 0, "cacheWrite": 0 },
-            "contextWindow": 128000,
-            "maxTokens": 32768
-          },
-          {
-            "id": "llama-3.1-8b-instant",
-            "name": "Llama 3.1 8B Instant",
-            "reasoning": false,
-            "input": ["text"],
-            "cost": { "input": 0.05, "output": 0.08, "cacheRead": 0, "cacheWrite": 0 },
-            "contextWindow": 131072,
-            "maxTokens": 8192
-          }
-        ]
-      }
-    }
-  },
   "agents": {
     "defaults": {
       "model": {
         "primary": "anthropic/claude-haiku-4-5-20251001",
-        "fallbacks": ["groq/llama-3.3-70b-versatile", "groq/llama-3.1-8b-instant"]
+        "fallbacks": ["groq/llama-3.3-70b-versatile"]
       },
       "workspace": "/app/workspace",
       "compaction": {
@@ -65,11 +20,7 @@
     }
   },
   "tools": {
-    "web": {
-      "search": {
-        "enabled": false
-      }
-    }
+    "profile": "messaging"
   },
   "messages": {
     "ackReactionScope": "group-mentions"
@@ -134,46 +85,22 @@
   },
   "skills": {
     "entries": {
-      "github": {
-        "enabled": false
-      },
-      "notion-api-integration": {
-        "enabled": false
-      },
-      "ai-core": {
-        "enabled": false
-      }
+      "github": { "enabled": false },
+      "notion-api-integration": { "enabled": false },
+      "ai-core": { "enabled": false }
     }
   },
   "plugins": {
     "entries": {
-      "telegram": {
-        "enabled": true
-      },
-      "discord": {
-        "enabled": false
-      },
-      "slack": {
-        "enabled": false
-      },
-      "device-pair": {
-        "enabled": false
-      },
-      "browser": {
-        "enabled": false
-      },
-      "phone-control": {
-        "enabled": false
-      },
-      "talk-voice": {
-        "enabled": false
-      },
-      "memory-core": {
-        "enabled": false
-      },
-      "file-transfer": {
-        "enabled": false
-      }
+      "telegram": { "enabled": true },
+      "discord": { "enabled": false },
+      "slack": { "enabled": false },
+      "device-pair": { "enabled": false },
+      "browser": { "enabled": false },
+      "phone-control": { "enabled": false },
+      "talk-voice": { "enabled": false },
+      "memory-core": { "enabled": false },
+      "file-transfer": { "enabled": false }
     }
   }
 }
