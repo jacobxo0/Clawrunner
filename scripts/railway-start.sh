@@ -31,6 +31,8 @@ fi
 
 # Opret workspace og cron så gatewayen ikke fejler
 mkdir -p "$ROOT/workspace" "$ROOT/cron"
+# Opret tom MEMORY.md så memory_get ikke fejler ved første kald
+[ -f "$ROOT/workspace/MEMORY.md" ] || touch "$ROOT/workspace/MEMORY.md"
 echo "[DEBUG] workspace + cron dirs OK"
 
 # Kopier config til HOME/.openclaw/ (OpenClaw læser herfra)

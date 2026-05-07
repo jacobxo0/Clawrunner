@@ -59,7 +59,7 @@
       "model": {
         "primary": "groq/llama-3.1-8b-instant"
       },
-      "workspace": "./workspace",
+      "workspace": "/app/workspace",
       "compaction": {
         "mode": "safeguard"
       },
