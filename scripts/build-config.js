@@ -17,7 +17,9 @@ const substituted = template.replace(/\$\{([^}]+)\}/g, function(match, name) {
 
 let cfg = JSON.parse(substituted);
 
-// Handle TELEGRAM_GROUP_ALLOW_FROM as JSON array
+// Handle TELEGRAM_GROUP_ALLOW_FROM as JSON array.
+// Kun override groupAllowFrom — allowFrom (DM-allowlist) beholdes fra template
+// med mindre TELEGRAM_GROUP_ALLOW_FROM eksplicit er sat og ikke-tom.
 const telegramAllow = process.env.TELEGRAM_GROUP_ALLOW_FROM || '[]';
 let arr;
 try {
@@ -26,11 +28,18 @@ try {
 } catch (_) {
   arr = [telegramAllow];
 }
-arr = arr.map(String);
+arr = arr.map(String).filter(Boolean);
 if (cfg.channels && cfg.channels.telegram) {
-  cfg.channels.telegram.groupAllowFrom = arr;
-  cfg.channels.telegram.allowFrom = arr;
+  // groupAllowFrom: brug env-array hvis ikke-tom, ellers behold template-værdien
+  if (arr.length > 0) {
+    cfg.channels.telegram.groupAllowFrom = arr;
+    // allowFrom synkroniseres kun hvis env var er sat — ellers bevares template-hardcode
+    cfg.channels.telegram.allowFrom = arr;
+  }
+  // Hvis arr er tom (env var ikke sat): behold template-værdier for begge felter
 }
+console.log('[build-config] telegram.allowFrom:', JSON.stringify(cfg.channels && cfg.channels.telegram && cfg.channels.telegram.allowFrom));
+console.log('[build-config] telegram.groupAllowFrom:', JSON.stringify(cfg.channels && cfg.channels.telegram && cfg.channels.telegram.groupAllowFrom));
 
 fs.writeFileSync(dst, JSON.stringify(cfg, null, 2));
 
