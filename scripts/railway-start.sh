@@ -63,6 +63,9 @@ echo "[DEBUG] GROQ_API_KEY is $([ -n "${GROQ_API_KEY:-}" ] && echo 'set' || echo
 echo "[DEBUG] TELEGRAM_BOT_TOKEN is $([ -n "${TELEGRAM_BOT_TOKEN:-}" ] && echo 'set' || echo 'NOT SET')"
 echo "[DEBUG] BRAVE_API_KEY is $([ -n "${BRAVE_API_KEY:-}" ] && echo 'set' || echo 'NOT SET')"
 
+# Deaktiver OpenClaw CLI respawn — crasher i Railway containers (entry.js respawn-mekanisme)
+export OPENCLAW_NO_RESPAWN=1
+
 # Øg Node heap; vis stack trace ved exit og unhandled rejections
 [ -n "${NODE_OPTIONS:-}" ] || export NODE_OPTIONS="--max-old-space-size=1024"
 export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn --trace-exit"
@@ -100,7 +103,7 @@ MAX_RESTARTS=20
 run_gateway() {
   echo "[DEBUG] Starting OpenClaw gateway on port $PORT (attempt $((RESTART_COUNT+1)))..."
   set +e
-  npx openclaw gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
+  npx openclaw gateway run --port "$PORT" --allow-unconfigured --verbose 2>&1
   EXIT=$?
   set -e
   echo "[EXIT] Gateway exited with code $EXIT"
