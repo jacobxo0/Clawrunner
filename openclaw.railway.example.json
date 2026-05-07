@@ -79,6 +79,7 @@
       "enabled": true,
       "dmPolicy": "allowlist",
       "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "webhookUrl": "${TELEGRAM_WEBHOOK_URL}",
       "groupAllowFrom": ["8572521981"],
       "allowFrom": ["8572521981"],
       "groups": {

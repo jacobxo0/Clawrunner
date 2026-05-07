@@ -1,64 +1,63 @@
-# Clawrunner — Debug Status
+# Clawrunner — Status
 
 ## Hvad er dette projekt
 OpenClaw gateway deployet på Railway. Formål: Telegram-bot der svarer via Groq AI.
+Live URL: **https://clawrunner-production.up.railway.app**
 
-## Nuværende status: Gateway crasher ved opstart
+## Nuværende status: KØRER
 
-### Symptom
-`npx openclaw gateway run` eksporterer med kode 1 umiddelbart efter:
+Gateway er oppe og svarer på `clawrunner-production.up.railway.app` (HTTP 200, Control UI tilgængeligt).
+
+### Løste problemer
+
+| Problem | Fix | Commit |
+|---------|-----|--------|
+| OpenClaw respawn-crash i Railway container | `OPENCLAW_NO_RESPAWN=1` + upgrade til 2026.5.6 | a2e602c |
+| `device-pair` plugin crash | Disabled i config | d812e81 |
+| Telegram 409 Conflict (polling overlap) | Skiftet til **webhook mode** via `RAILWAY_PUBLIC_DOMAIN` | seneste |
+| `gateway.bind` loopback-default | Sat til `lan` | 8872289 |
+| Brave search ikke bundled | Disabled | 438db17 |
+
+### Telegram webhook mode (aktiv)
+
+`railway-start.sh` auto-konstruerer webhook URL fra `RAILWAY_PUBLIC_DOMAIN` (sættes automatisk af Railway):
 ```
-Registered plugin command: /pair (plugin: device-pair)
-[EXIT] Gateway exited with code 1
-```
-
-### Hvad vi har fundet
-
-**Crash-lokation (fra `--trace-exit`):**
-```
-at file:///app/node_modules/openclaw/dist/entry.js:372:14
-```
-
-Koden der kører der:
-```js
-process$1.exitCode = 1;
-console.error("[openclaw] Failed to respawn CLI:", error ...);
-// ...
-process$1.exit(1);
+TELEGRAM_WEBHOOK_URL=https://clawrunner-production.up.railway.app/telegram-webhook
 ```
 
-OpenClaw forsøger at **respawne CLI-processen** og fejler. Det er ikke en konfigurationsfejl — det er en intern mekanisme i OpenClaw der crasher.
+OpenClaw lytter på `/telegram-webhook` og kalder `setWebhook` automatisk ved opstart.
+Start-scriptet registrerer webhook med Telegram inden gateway starter.
 
-**`openclaw doctor` opfører sig identisk:**
-- Printer kun banner + `┌  OpenClaw doctor`
-- Eksiterer med kode 1 uden at køre nogen checks
-- Samme crash-lokation (entry.js:372)
+## Konfiguration
 
-### Hvad vi har udelukket
-- ✅ Alle API-nøgler er sat: `GROQ_API_KEY`, `TELEGRAM_BOT_TOKEN`, `BRAVE_API_KEY`
-- ✅ Config genereres korrekt fra template
-- ✅ Config kopieres til `/root/.openclaw/openclaw.json` (korrekt HOME)
-- ✅ `gateway.bind`, `models.providers` schema-fejl er fikset
-- ✅ Korrekt subkommando: `gateway run` (ikke bare `gateway`)
-- ✅ Telegram, GitHub skill, Notion skill — ingen af dem er årsagen
-- ✅ Groq vs. Anthropic model — ingen forskel
-
-### Root cause (formodning)
-OpenClaw 2026.3.13 forsøger at **respawne sin egen CLI-proces** som en child-process, og denne mekanisme fejler i Railway's container-miljø (formentlig pga. process-isolation, manglende TTY, eller fordi `npx` ikke kan genfindes fra child-processen).
-
-## Konfiguration der er klar til brug
-
-Alle disse er fixet og klar:
-- `openclaw.railway.example.json` — valid config, ingen schema-fejl
-- `scripts/build-config.js` — substituerer env-vars korrekt
-- `scripts/railway-start.sh` — bygger og kopierer config korrekt
+- `openclaw.railway.example.json` — config-template med env-var-placeholders
+- `scripts/build-config.js` — substituerer env-vars ind i template
+- `scripts/railway-start.sh` — bygger config, registrerer Telegram webhook, starter gateway
 - `railway.toml` — `startCommand = "bash scripts/railway-start.sh"`
-- `Dockerfile` — `node:22-bookworm-slim`, `npm install`
+- `Dockerfile` — `node:22-bookworm-slim`
 
-## Næste skridt (afventer instruks)
+## Railway Variables der skal sættes
 
-Mulige veje frem:
-1. **Pin en ældre OpenClaw version** i `package.json` der ikke bruger respawn-mekanismen
-2. **Kontakt OpenClaw support** med fejlen (entry.js:372, respawn failure i container)
-3. **Brug `npm start` direkte** (package.json har `"start": "openclaw gateway --port ${PORT:-18789}"`) — den ældre kommando uden `run` subkommand
-4. **Skift til en anden gateway-løsning** der ikke kræver OpenClaw
+| Variabel | Påkrævet | Note |
+|----------|----------|------|
+| `OPENCLAW_GATEWAY_TOKEN` | Ja | Gateway auth-token |
+| `TELEGRAM_BOT_TOKEN` | Ja | Telegram bot-token fra BotFather |
+| `GROQ_API_KEY` | Ja | Groq API-nøgle |
+| `TELEGRAM_WEBHOOK_URL` | Nej | Auto-sat fra RAILWAY_PUBLIC_DOMAIN |
+| `BRAVE_API_KEY` | Nej | Disabled i config |
+
+## Genstart / redeploy
+
+```bash
+# Force redeploy (via Railway CLI)
+railway redeploy
+
+# Check logs
+railway logs --tail 100
+```
+
+## Potentielle forbedringer
+
+1. **Ekstern monitoring** — GitHub Actions workflow der pinger botten hvert 10. minut (se docs/DEPLOYMENT_ANALYSIS.md sektion 9)
+2. **Fallback model** — Groq llama-3.1-8b-instant til function calling (llama-3.3-70b er ustabil til tool-use)
+3. **Hetzner migration** — Fuld kontrol, ingen rolling-deploy overlap (se docs/DEPLOYMENT_ANALYSIS.md)

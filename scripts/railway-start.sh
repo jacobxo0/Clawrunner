@@ -20,6 +20,20 @@ echo "[DEBUG] OPENCLAW_GATEWAY_TOKEN is set"
 # Default for Telegram allowFrom hvis ikke sat (tom array)
 export TELEGRAM_GROUP_ALLOW_FROM="${TELEGRAM_GROUP_ALLOW_FROM:-[]}"
 
+# Auto-konstruér Telegram webhook URL fra Railway's public domain (aktiverer webhook mode)
+# Fallback til polling hvis RAILWAY_PUBLIC_DOMAIN ikke er sat (lokal kørsel)
+if [ -z "${TELEGRAM_WEBHOOK_URL:-}" ] && [ -n "${RAILWAY_PUBLIC_DOMAIN:-}" ]; then
+  export TELEGRAM_WEBHOOK_URL="https://${RAILWAY_PUBLIC_DOMAIN}/telegram-webhook"
+  echo "[DEBUG] Telegram webhook URL auto-set: $TELEGRAM_WEBHOOK_URL"
+else
+  export TELEGRAM_WEBHOOK_URL="${TELEGRAM_WEBHOOK_URL:-}"
+  if [ -n "${TELEGRAM_WEBHOOK_URL:-}" ]; then
+    echo "[DEBUG] Telegram webhook URL (from env): $TELEGRAM_WEBHOOK_URL"
+  else
+    echo "[DEBUG] Telegram webhook URL not set — polling mode"
+  fi
+fi
+
 # Byg openclaw.json fra template ved at substituere ${VAR} fra env
 # Bruger Node så vi ikke afhænger af envsubst (gettext).
 if [ -f "$ROOT/openclaw.railway.example.json" ]; then
@@ -57,6 +71,7 @@ echo "[DEBUG] Config telegram.allowFrom: $(node -e "try{const c=require('$ROOT/o
 echo "[DEBUG] Config telegram.botToken set: $(node -e "try{const c=require('$ROOT/openclaw.json');const t=c.channels&&c.channels.telegram&&c.channels.telegram.botToken;console.log(t&&t.length>0?'YES (len='+t.length+')':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
 echo "[DEBUG] Config gateway.auth.token set: $(node -e "try{const c=require('$ROOT/openclaw.json');const t=c.gateway&&c.gateway.auth&&c.gateway.auth.token;console.log(t&&t.length>0?'YES':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
 echo "[DEBUG] Config brave.apiKey set: $(node -e "try{const c=require('$ROOT/openclaw.json');const t=c.tools&&c.tools.web&&c.tools.web.search&&c.tools.web.search.apiKey;console.log(t&&t.length>0?'YES':'EMPTY')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
+echo "[DEBUG] Config telegram.webhookUrl: $(node -e "try{const c=require('$ROOT/openclaw.json');const t=c.channels&&c.channels.telegram&&c.channels.telegram.webhookUrl;console.log(t&&t.length>0?t:'(empty — polling mode)')}catch(e){console.log('PARSE ERROR:'+e.message)}" 2>&1)"
 # === END CONFIG VERIFICATION ===
 
 echo "[DEBUG] GROQ_API_KEY is $([ -n "${GROQ_API_KEY:-}" ] && echo 'set' || echo 'NOT SET')"
@@ -83,18 +98,30 @@ DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
 
-# Ryd evt. webhook og polling-konflikt fra Telegram inden gateway starter.
-# deleteWebhook fjerner webhook-mode. Efterfølgende getUpdates med timeout=0 tvinger
-# eventuelle gamle polling-sessioner (409-konflikt) til at stoppe.
-echo "[DEBUG] Clearing any stale Telegram webhook + forcing polling reset..."
+# Ryd evt. gammel webhook/polling-tilstand fra Telegram inden gateway starter.
+# Ved webhook mode: deleteWebhook + setWebhook (OpenClaw registrerer selv, men vi rydder først)
+# Ved polling mode: deleteWebhook + getUpdates tvinger gamle sessioner ud (forhindrer 409)
+echo "[DEBUG] Clearing stale Telegram state..."
 curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true" \
   > /dev/null || true
-# Kald getUpdates én gang for at tvinge gamle sessioner ud (forhindrer 409)
-curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=1&timeout=0&offset=-1" \
-  > /dev/null || true
-# Vent lidt så Telegram når at registrere reset
-sleep 3
-echo "[DEBUG] Telegram polling reset done"
+
+if [ -n "${TELEGRAM_WEBHOOK_URL:-}" ]; then
+  echo "[DEBUG] Webhook mode — registering webhook with Telegram..."
+  WEBHOOK_RESULT=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
+    -d "url=${TELEGRAM_WEBHOOK_URL}" \
+    -d "drop_pending_updates=true" \
+    -d "max_connections=1" \
+    -d "allowed_updates=[\"message\",\"callback_query\"]" 2>/dev/null || echo '{}')
+  echo "[DEBUG] setWebhook result: $WEBHOOK_RESULT"
+else
+  # Polling mode: tvang gamle sessioner ud med én getUpdates
+  curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=1&timeout=0&offset=-1" \
+    > /dev/null || true
+  echo "[DEBUG] Polling mode — webhook cleared"
+fi
+
+sleep 2
+echo "[DEBUG] Telegram state reset done"
 
 # Watchdog: genstarter gatewayen automatisk ved exit (polling-drop, OOM, etc.)
 RESTART_COUNT=0
@@ -109,22 +136,21 @@ run_gateway() {
   echo "[EXIT] Gateway exited with code $EXIT"
 }
 
-# DEBUG: Telegram notifikationer midlertidigt deaktiveret
-# (sleep 15 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-#   --data-urlencode "chat_id=8572521981" \
-#   --data-urlencode "text=✅ Clawrunner er online og klar. Model: groq/llama-3.3-70b-versatile" \
-#   > /dev/null) &
+# Send Telegram-notifikation når gatewayen er oppe (baggrundsprocess)
+(sleep 15 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+  --data-urlencode "chat_id=8572521981" \
+  --data-urlencode "text=Clawrunner er online. Model: groq/llama-3.3-70b-versatile. Mode: ${TELEGRAM_WEBHOOK_URL:+webhook}${TELEGRAM_WEBHOOK_URL:-polling}" \
+  > /dev/null 2>&1) &
 
 while [ $RESTART_COUNT -lt $MAX_RESTARTS ]; do
   run_gateway
   RESTART_COUNT=$((RESTART_COUNT+1))
   if [ $RESTART_COUNT -lt $MAX_RESTARTS ]; then
     echo "[WATCHDOG] Gateway stoppede. Genstarter om 5s... (forsøg $RESTART_COUNT/$MAX_RESTARTS)"
-    # DEBUG: Telegram notifikationer midlertidigt deaktiveret
-    # curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-    #   --data-urlencode "chat_id=8572521981" \
-    #   --data-urlencode "text=⚠️ Clawrunner genstartet (forsøg $RESTART_COUNT/$MAX_RESTARTS)" \
-    #   > /dev/null || true
+    curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+      --data-urlencode "chat_id=8572521981" \
+      --data-urlencode "text=Clawrunner genstartet (forsøg $RESTART_COUNT/$MAX_RESTARTS)" \
+      > /dev/null 2>&1 || true
     sleep 5
   fi
 done
