@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="${OPENCLAW_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 cd "$ROOT"
 
+# Brug lokal binary direkte — npx kan ikke genfindes ved OpenClaw's interne respawn i Railway
+OPENCLAW="$ROOT/node_modules/.bin/openclaw"
+
 echo "[DEBUG] ROOT=$ROOT PWD=$(pwd)"
 
 # Port fra Railway (påkrævet)
@@ -69,13 +72,13 @@ export NODE_OPTIONS="${NODE_OPTIONS} --unhandled-rejections=warn --trace-exit"
 
 # Tjek at openclaw findes
 echo "[DEBUG] Checking openclaw..."
-npx openclaw --version 2>&1 || true
+"$OPENCLAW" --version 2>&1 || true
 echo "[DEBUG] openclaw check done"
 
 # Kør openclaw doctor (config er allerede kopieret til alle steder ovenfor)
 echo "[DEBUG] Running openclaw doctor..."
 set +e
-NO_COLOR=1 FORCE_COLOR=0 npx openclaw doctor 2>&1
+NO_COLOR=1 FORCE_COLOR=0 "$OPENCLAW" doctor 2>&1
 DOCTOR_EXIT=$?
 set -e
 echo "[DEBUG] Doctor exit: $DOCTOR_EXIT"
@@ -100,7 +103,7 @@ MAX_RESTARTS=20
 run_gateway() {
   echo "[DEBUG] Starting OpenClaw gateway on port $PORT (attempt $((RESTART_COUNT+1)))..."
   set +e
-  npx openclaw gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
+  "$OPENCLAW" gateway run --port "$PORT" --dev --allow-unconfigured --verbose 2>&1
   EXIT=$?
   set -e
   echo "[EXIT] Gateway exited with code $EXIT"
