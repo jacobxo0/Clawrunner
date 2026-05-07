@@ -194,6 +194,12 @@
       },
       "talk-voice": {
         "enabled": false
+      },
+      "memory-core": {
+        "enabled": false
+      },
+      "file-transfer": {
+        "enabled": false
       }
     }
   }
