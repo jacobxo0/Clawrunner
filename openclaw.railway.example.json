@@ -63,10 +63,7 @@
   "tools": {
     "web": {
       "search": {
-        "provider": "brave",
-        "apiKey": "${BRAVE_API_KEY}",
-        "maxResults": 10,
-        "timeoutSeconds": 30
+        "enabled": false
       }
     }
   },
