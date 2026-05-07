@@ -6,8 +6,8 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "anthropic/claude-haiku-4-5-20251001",
-        "fallbacks": ["groq/llama-3.3-70b-versatile"]
+        "primary": "groq/llama-3.3-70b-versatile",
+        "fallbacks": []
       },
       "workspace": "/app/workspace",
       "compaction": {
