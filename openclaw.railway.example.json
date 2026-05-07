@@ -3,61 +3,11 @@
     "lastTouchedVersion": "2026.5.6",
     "lastTouchedAt": "2026-05-07T00:00:00.000Z"
   },
-  "wizard": {
-    "lastRunAt": "",
-    "lastRunVersion": "",
-    "lastRunCommand": "",
-    "lastRunMode": "local"
-  },
-  "models": {
-    "providers": {
-      "anthropic": {
-        "apiKey": "${ANTHROPIC_API_KEY}",
-        "baseUrl": "https://api.anthropic.com",
-        "api": "anthropic-messages",
-        "models": [
-          {
-            "id": "claude-haiku-4-5-20251001",
-            "name": "Claude Haiku 4.5",
-            "reasoning": false,
-            "input": ["text"],
-            "cost": { "input": 0.80, "output": 4.00, "cacheRead": 0.08, "cacheWrite": 1.00 },
-            "contextWindow": 200000,
-            "maxTokens": 8096
-          },
-          {
-            "id": "claude-sonnet-4-6",
-            "name": "Claude Sonnet 4.6",
-            "reasoning": false,
-            "input": ["text"],
-            "cost": { "input": 3.00, "output": 15.00, "cacheRead": 0.30, "cacheWrite": 3.75 },
-            "contextWindow": 200000,
-            "maxTokens": 8096
-          }
-        ]
-      },
-      "groq": {
-        "apiKey": "${GROQ_API_KEY}",
-        "api": "openai-completions",
-        "baseUrl": "https://api.groq.com/openai/v1",
-        "models": [
-          {
-            "id": "llama-3.1-8b-instant",
-            "name": "Llama 3.1 8B Instant",
-            "reasoning": false,
-            "input": ["text"],
-            "cost": { "input": 0.05, "output": 0.08, "cacheRead": 0, "cacheWrite": 0 },
-            "contextWindow": 131072,
-            "maxTokens": 8192
-          }
-        ]
-      }
-    }
-  },
   "agents": {
     "defaults": {
       "model": {
-        "primary": "groq/llama-3.1-8b-instant"
+        "primary": "anthropic/claude-haiku-4-5-20251001",
+        "fallbacks": ["groq/llama-3.1-8b-instant"]
       },
       "workspace": "/app/workspace",
       "compaction": {
@@ -72,9 +22,7 @@
   "tools": {
     "web": {
       "search": {
-        "provider": "duckduckgo",
-        "maxResults": 10,
-        "timeoutSeconds": 30
+        "enabled": false
       }
     }
   },
@@ -112,7 +60,7 @@
     }
   },
   "gateway": {
-    "port": 18789,
+    "port": 8080,
     "mode": "local",
     "bind": "lan",
     "auth": {
