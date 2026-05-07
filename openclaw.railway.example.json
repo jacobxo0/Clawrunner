@@ -108,6 +108,9 @@
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_TOKEN}"
     },
+    "controlUi": {
+      "allowedOrigins": ["https://clawrunner-production.up.railway.app"]
+    },
     "tailscale": {
       "mode": "off",
       "resetOnExit": false
