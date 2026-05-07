@@ -13,6 +13,8 @@
     "providers": {
       "anthropic": {
         "apiKey": "${ANTHROPIC_API_KEY}",
+        "baseUrl": "https://api.anthropic.com",
+        "api": "anthropic-messages",
         "models": [
           {
             "id": "claude-haiku-4-5-20251001",
