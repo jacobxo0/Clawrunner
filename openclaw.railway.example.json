@@ -80,10 +80,10 @@
   "channels": {
     "telegram": {
       "enabled": true,
-      "dmPolicy": "allowlist",
+      "dmPolicy": "open",
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "groupAllowFrom": [],
-      "allowFrom": [],
+      "allowFrom": [8572521981],
       "groups": {
         "*": {
           "requireMention": true
