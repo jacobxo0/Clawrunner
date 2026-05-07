@@ -83,7 +83,7 @@
       "allowFrom": [],
       "groups": {
         "*": {
-          "requireMention": true
+          "requireMention": false
         }
       },
       "groupPolicy": "allowlist"
