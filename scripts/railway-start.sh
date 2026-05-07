@@ -109,22 +109,22 @@ run_gateway() {
   echo "[EXIT] Gateway exited with code $EXIT"
 }
 
-# Send Telegram notifikation første gang gateway starter
-(sleep 15 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-  --data-urlencode "chat_id=8572521981" \
-  --data-urlencode "text=✅ Clawrunner er online og klar. Model: groq/llama-3.3-70b-versatile" \
-  > /dev/null) &
+# DEBUG: Telegram notifikationer midlertidigt deaktiveret
+# (sleep 15 && curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+#   --data-urlencode "chat_id=8572521981" \
+#   --data-urlencode "text=✅ Clawrunner er online og klar. Model: groq/llama-3.3-70b-versatile" \
+#   > /dev/null) &
 
 while [ $RESTART_COUNT -lt $MAX_RESTARTS ]; do
   run_gateway
   RESTART_COUNT=$((RESTART_COUNT+1))
   if [ $RESTART_COUNT -lt $MAX_RESTARTS ]; then
     echo "[WATCHDOG] Gateway stoppede. Genstarter om 5s... (forsøg $RESTART_COUNT/$MAX_RESTARTS)"
-    # Send Telegram notifikation ved genstart
-    curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-      --data-urlencode "chat_id=8572521981" \
-      --data-urlencode "text=⚠️ Clawrunner genstartet (forsøg $RESTART_COUNT/$MAX_RESTARTS)" \
-      > /dev/null || true
+    # DEBUG: Telegram notifikationer midlertidigt deaktiveret
+    # curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+    #   --data-urlencode "chat_id=8572521981" \
+    #   --data-urlencode "text=⚠️ Clawrunner genstartet (forsøg $RESTART_COUNT/$MAX_RESTARTS)" \
+    #   > /dev/null || true
     sleep 5
   fi
 done
