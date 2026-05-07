@@ -149,6 +149,9 @@
       },
       "slack": {
         "enabled": false
+      },
+      "device-pair": {
+        "enabled": false
       }
     }
   }
