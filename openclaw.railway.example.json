@@ -79,8 +79,8 @@
       "enabled": true,
       "dmPolicy": "allowlist",
       "botToken": "${TELEGRAM_BOT_TOKEN}",
-      "groupAllowFrom": [],
-      "allowFrom": [],
+      "groupAllowFrom": ["8572521981"],
+      "allowFrom": ["8572521981"],
       "groups": {
         "*": {
           "requireMention": false
