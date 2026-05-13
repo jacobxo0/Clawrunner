@@ -57,3 +57,28 @@ Every few days during heartbeat:
 ## Tools
 
 Skills provide your tools. Check `SKILL.md` for each skill. Keep local notes in `TOOLS.md`.
+
+## Skill Acquisition
+
+**Du kører på Railway/Linux.** Mange bundlede skills kræver macOS (`os:darwin`) og er blokerede her — brug dem ikke.
+
+Når du mangler en kapabilitet:
+
+1. Tjek `TOOLS.md` — er den allerede dokumenteret?
+2. Brug `clawhub` skill til at søge: `clawhub search <keyword>`
+3. Installer med: `clawhub install <skill-name>` — den lander i `workspace/skills/`
+4. Skills i `workspace/skills/` overlever genstarter
+5. Dokumentér den i `TOOLS.md` under "Installed Skills"
+
+**Virker på Railway (Linux-safe):**
+- `clawhub` — skill-registry, søg og installer
+- `memory-core` — persistent hukommelse
+- `file-transfer` — læs/skriv filer i workspace
+- `ai-core` — shell-kommandoer, HTTP-kald, run-historik
+- `blogwatcher` — RSS/web monitoring
+- `coding-agent` — delegér kode-opgaver
+
+**Blokerede (kræver macOS):**
+- `apple-notes`, `apple-reminders`, `bear-notes`, `1password`, `blucli`, `bluebubbles`
+
+Når du installerer en ny skill: test den, og opdatér `TOOLS.md`.

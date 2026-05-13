@@ -37,4 +37,39 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 
 ---
 
+## Miljø
+
+- **Platform:** Railway, Linux (Debian bookworm-slim), Node 22
+- **Workspace:** `/app/workspace`
+- **Gateway URL:** `https://clawrunner-production.up.railway.app`
+- **AI-CORE URL:** Se Railway Variable `AI_CORE_URL`
+
+## Aktive Skills (bekræftet virker på Linux)
+
+| Skill | Hvad den kan |
+|-------|-------------|
+| `clawhub` | Søg og installer skills fra registry |
+| `memory-core` | Persistent hukommelse på tværs af sessioner |
+| `file-transfer` | Læs/skriv filer i workspace |
+| `ai-core` | Shell-kommandoer, HTTP-kald, run-historik via AI_CORE_URL |
+| `blogwatcher` | RSS/Atom feed monitoring |
+| `coding-agent` | Delegér kode-opgaver til ekstern coder |
+
+## Blokerede Skills (kræver macOS — ignorer dem)
+
+`apple-notes`, `apple-reminders`, `bear-notes`, `1password`, `blucli`, `bluebubbles`, `camsnap`
+
+## Installed Skills (opdatér når du installerer nye)
+
+_Ingen endnu — brug `clawhub search <keyword>` for at finde og installere._
+
+## Skill Acquisition Workflow
+
+```
+1. clawhub search <hvad du mangler>
+2. clawhub install <skill-name>
+3. Test den
+4. Tilføj til "Installed Skills" ovenfor
+```
+
 Add whatever helps you do your job. This is your cheat sheet.
