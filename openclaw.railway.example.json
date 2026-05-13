@@ -20,7 +20,7 @@
     }
   },
   "tools": {
-    "profile": "standard"
+    "profile": "full"
   },
   "messages": {
     "ackReactionScope": "group-mentions"
