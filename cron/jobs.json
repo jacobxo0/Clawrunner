@@ -97,5 +97,72 @@
         "lastDeliveryStatus": "delivered"
       }
     }
+  ,
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "research-pulse",
+      "enabled": true,
+      "createdAtMs": 1747180800000,
+      "updatedAtMs": 1747180800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8 * * 1,4",
+        "tz": "Europe/Copenhagen"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are Ignis running a research sweep. Read workspace/notes/research-feeds.md for your feed list and filtering rules. For each feed: fetch the URL using fetch_url via ai-core (POST ${AI_CORE_URL}/command with {\"command\":\"fetch_url\",\"arguments\":{\"url\":\"<feed_url>\"}}). Parse the response and extract items published in the last 48h that match the filtering topics. Write a short summary (max 5 bullets per feed, only relevant items) to workspace/memory/research/$(date +%Y-%m-%d).md. Append a one-line entry to workspace/MEMORY.md under a 'Research' section: 'YYYY-MM-DD: [brief summary of what was notable]'. Keep total token use minimal — skip feeds that return errors, skip irrelevant items without summarizing them. Reply with a 2-line report of what you found and saved."
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      }
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "self-improvement-weekly",
+      "enabled": true,
+      "createdAtMs": 1747180800000,
+      "updatedAtMs": 1747180800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 22 * * 0",
+        "tz": "Europe/Copenhagen"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are Ignis running the weekly self-improvement loop. Follow workspace/notes/self-improvement.md exactly. Steps: 1) Read workspace/memory/ (last 7 days). 2) Read workspace/MEMORY.md. 3) Read workspace/IMPROVEMENTS-BACKLOG.md. 4) Identify patterns: repeated problems, things asked more than once, missing docs, broken flows. 5) For each finding: add a concrete proposal to IMPROVEMENTS-BACKLOG.md (format: YYYY-MM-DD: description [PENDING]). 6) Implement any proposals that are small and safe right now — mark them [DONE]. 7) Update MEMORY.md with 1-3 distilled learnings if new ones emerged. 8) Write one line to workspace/memory/$(date +%Y-%m-%d).md: 'Self-improvement: found X issues, implemented Y, added Z proposals.' Reply with a brief summary of what changed."
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      }
+    },
+    {
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "capability-check",
+      "enabled": true,
+      "createdAtMs": 1747180800000,
+      "updatedAtMs": 1747180800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 21 * * 0",
+        "tz": "Europe/Copenhagen"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are Ignis running the weekly capability check. Follow workspace/notes/capability-loops.md. Steps: 1) Read workspace/memory/ (last 7 days) and workspace/IMPROVEMENTS-BACKLOG.md. 2) Check for: (a) turns with only discussion and no file changes or commands — Execution gate trigger; (b) weeks with no DONE items in backlog — Output pressure trigger; (c) repeated same errors or failed patterns — Problem-driven competency trigger. 3) For each trigger found: add a [CAPABILITY] proposal to IMPROVEMENTS-BACKLOG.md with a concrete rule or skill to add. 4) Implement any small capability additions directly (add a rule to AGENTS.md, update TOOLS.md, etc.) and mark [DONE]. 5) Update MEMORY.md: 'Tilføjet kompetence: [hvad] pga. [trigger]' for each implemented item. Reply with what capabilities were added or proposed."
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "last"
+      }
+    }
   ]
 }

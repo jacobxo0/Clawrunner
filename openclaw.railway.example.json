@@ -16,6 +16,18 @@
       "maxConcurrent": 4,
       "subagents": {
         "maxConcurrent": 8
+      },
+      "heartbeat": {
+        "every": "30m",
+        "target": "last",
+        "lightContext": true,
+        "isolatedSession": true,
+        "skipWhenBusy": true,
+        "activeHours": {
+          "start": "07:00",
+          "end": "23:00",
+          "timezone": "Europe/Copenhagen"
+        }
       }
     }
   },

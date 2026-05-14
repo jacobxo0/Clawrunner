@@ -45,7 +45,7 @@ node "$ROOT/scripts/build-config.js" "$ROOT"
 echo "[DEBUG] Config bygget: $ROOT/openclaw.json"
 
 # === SETUP DIRS ===
-mkdir -p "$ROOT/workspace" "$ROOT/cron"
+mkdir -p "$ROOT/workspace" "$ROOT/cron" "$ROOT/workspace/memory" "$ROOT/workspace/memory/research"
 [ -f "$ROOT/workspace/MEMORY.md" ] || touch "$ROOT/workspace/MEMORY.md"
 
 REAL_HOME="${HOME:-/root}"
