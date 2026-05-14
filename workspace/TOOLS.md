@@ -61,7 +61,21 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 
 ## Installed Skills (opdatér når du installerer nye)
 
-_Ingen endnu — brug `clawhub search <keyword>` for at finde og installere._
+| Skill | Fil | Kræver |
+|-------|-----|--------|
+| `tavily-search` | `workspace/skills/tavily-search/SKILL.md` | `TAVILY_API_KEY` |
+| `jina-reader` | `workspace/skills/jina-reader/SKILL.md` | Ingen (gratis) |
+| `fal-image` | `workspace/skills/fal-image/SKILL.md` | `FAL_API_KEY` |
+| `ai-core` | `workspace/skills/ai-core/README.md` | `AI_CORE_URL` |
+
+## Marketing Pipeline Agents
+
+| Agent | Fil | Rolle |
+|-------|-----|-------|
+| `DISPATCHER` | `workspace/agents/DISPATCHER.md` | Intent-router, starter pipelines |
+| `COPY_AGENT` | `workspace/agents/COPY_AGENT.md` | Tekst, narrative, tone |
+| `VISUAL_AGENT` | `workspace/agents/VISUAL_AGENT.md` | Billedgenerering via fal.ai |
+| `RESEARCH_AGENT` | `workspace/agents/RESEARCH_AGENT.md` | Markedsdata, konkurrenter |
 
 ## Skill Acquisition Workflow
 
