@@ -6,7 +6,12 @@ Forslag fra gennemgang af memory, MEMORY.md og (når tilgængeligt) samtalehisto
 
 ## Format per forslag
 
-- **YYYY-MM-DD:** Kort beskrivelse. (Kilde: memory / transcripts / MEMORY.) [DONE] eller [PENDING] / [NEEDS USER]
+- **YYYY-MM-DD:** Kort beskrivelse. (Kilde: memory / transcripts / MEMORY.) [SMALL] / [MEDIUM] / [LARGE] + [DONE] / [PENDING] / [NEEDS USER] / [CAPABILITY]
+
+**Size-definition:**
+- `[SMALL]` = én fil redigeret, max 10 min, ingen bruger-godkendelse nødvendig — heartbeat implementerer selv
+- `[MEDIUM]` = 2-5 filer, kræver test, heartbeat foreslår men venter på bekræftelse
+- `[LARGE]` = arkitektur, ny service, kræver deploy — altid [NEEDS USER]
 
 ---
 

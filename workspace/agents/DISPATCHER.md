@@ -73,3 +73,10 @@ Lever: titel, problem, løsning, marked, traction, team, ask — med billeder og
 - Research: `workspace/agents/RESEARCH_AGENT.md`
 - Copy: `workspace/agents/COPY_AGENT.md`
 - Visual: `workspace/agents/VISUAL_AGENT.md`
+- Assembly: `workspace/agents/ASSEMBLY_AGENT.md` ← saml og gem output
+
+## Assembly er altid det sidste trin
+
+Ingen pipeline er færdig uden at ASSEMBLY_AGENT har gemt et markdown-dokument
+i workspace og rapporteret filstien til Jacob. Visual er valgfrit ved fejl —
+assembly kører altid, selv om visual mangler.
