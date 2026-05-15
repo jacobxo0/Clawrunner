@@ -45,8 +45,23 @@ node "$ROOT/scripts/build-config.js" "$ROOT"
 echo "[DEBUG] Config bygget: $ROOT/openclaw.json"
 
 # === SETUP DIRS ===
-mkdir -p "$ROOT/workspace" "$ROOT/cron" "$ROOT/workspace/memory" "$ROOT/workspace/memory/research"
-[ -f "$ROOT/workspace/MEMORY.md" ] || touch "$ROOT/workspace/MEMORY.md"
+mkdir -p "$ROOT/cron"
+
+# Brug persistent volume hvis monteret — ellers ephemeral fallback
+VOLUME_WORKSPACE="/data/workspace"
+if [ -d "/data" ]; then
+  echo "[DEBUG] Railway Volume fundet på /data — bruger persistent workspace"
+  mkdir -p "$VOLUME_WORKSPACE" "$VOLUME_WORKSPACE/memory" "$VOLUME_WORKSPACE/memory/research"
+  [ -f "$VOLUME_WORKSPACE/MEMORY.md" ] || touch "$VOLUME_WORKSPACE/MEMORY.md"
+  # Symlink /app/workspace → /data/workspace så openclaw.json ikke skal ændres
+  rm -rf "$ROOT/workspace"
+  ln -sfn "$VOLUME_WORKSPACE" "$ROOT/workspace"
+  echo "[DEBUG] Symlink: $ROOT/workspace → $VOLUME_WORKSPACE"
+else
+  echo "[DEBUG] Ingen Railway Volume — bruger ephemeral workspace (hukommelse mistes ved redeploy)"
+  mkdir -p "$ROOT/workspace" "$ROOT/workspace/memory" "$ROOT/workspace/memory/research"
+  [ -f "$ROOT/workspace/MEMORY.md" ] || touch "$ROOT/workspace/MEMORY.md"
+fi
 
 REAL_HOME="${HOME:-/root}"
 mkdir -p "$REAL_HOME/.openclaw/agents/main/sessions" "$REAL_HOME/.openclaw/credentials"
