@@ -52,7 +52,17 @@ VOLUME_WORKSPACE="/data/workspace"
 if [ -d "/data" ]; then
   echo "[DEBUG] Railway Volume fundet på /data — bruger persistent workspace"
   mkdir -p "$VOLUME_WORKSPACE" "$VOLUME_WORKSPACE/memory" "$VOLUME_WORKSPACE/memory/research"
-  [ -f "$VOLUME_WORKSPACE/MEMORY.md" ] || touch "$VOLUME_WORKSPACE/MEMORY.md"
+  # Seed MEMORY.md fra repo hvis den er tom (første opstart)
+  if [ ! -s "$VOLUME_WORKSPACE/MEMORY.md" ]; then
+    if [ -f "$ROOT/scripts/seed-memory.md" ]; then
+      cp "$ROOT/scripts/seed-memory.md" "$VOLUME_WORKSPACE/MEMORY.md"
+      echo "[DEBUG] MEMORY.md seedet fra scripts/seed-memory.md"
+    else
+      touch "$VOLUME_WORKSPACE/MEMORY.md"
+    fi
+  else
+    echo "[DEBUG] MEMORY.md eksisterer med indhold ($(wc -c < "$VOLUME_WORKSPACE/MEMORY.md") bytes) — seeding sprunget over"
+  fi
   # Symlink /app/workspace → /data/workspace så openclaw.json ikke skal ændres
   rm -rf "$ROOT/workspace"
   ln -sfn "$VOLUME_WORKSPACE" "$ROOT/workspace"
